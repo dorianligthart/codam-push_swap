@@ -23,6 +23,9 @@ $(LIBFT_A):
 $(NAME): $(OBJ)
 	@$(CC) $(OBJ) $(LIBS) $(HEADERS) -o $(NAME)
 
+$(NAME_BON): $(OBJ_BON)
+	@$(CC) $(OBJ_BON) $(LIBS) $(HEADERS) -o $(NAME_BON)
+
 clean:
 	@rm -rf $(OBJ)
 	@rm -rf $(OBJ_BON)
