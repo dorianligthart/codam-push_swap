@@ -6,7 +6,7 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 16:53:34 by doligtha          #+#    #+#             */
-/*   Updated: 2024/04/12 01:43:34 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/04/20 21:53:20 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,132 +14,120 @@
 #include "libft.h"
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <limits.h>
 
-// #include "pushswap.h"
-#include "libft.h"
-
-//step 2:
-//O^N through a stack. and find smallest but bigger than index and set to index.
-static inline void	ps_normalise_stack(unsigned int *stack, \
-									   unsigned int size)
+//O^N^2
+//loops through stack, finds the smallest && bigger than index and set to index.
+static inline void	ps_normalise(t_ps_stack *s)
 {
-	unsigned int	i;
-	unsigned int	k;
+	unsigned int	x;
+	unsigned int	y;
 	unsigned int	min;
 	unsigned int	tmp;
 
-	i = -1;
-	while (++i < size)
+	y = -1;
+	while (++y < s->size)
 	{
-		k = -1;
+		x = -1;
 		min = UINT_MAX;
-		while (++k < size)
+		while (++x < s->size)
 		{
-			if ((min > stack[k] || (i == size - 1 && stack[k] == UINT_MAX))
-				&& i <= stack[k])
+			if ((min > s->stack[x]
+				|| (y == s->size - 1 && s->stack[x] == UINT_MAX))
+				&& y <= s->stack[x])
 			{
-				min = stack[k];
-				tmp = k;
+				min = s->stack[x];
+				tmp = x;
 			}
 		}
-		stack[tmp] = i;
+		s->stack[tmp] = y;
 	}
 }
 
-//step 1:	int's:				to	unsigned int's:
-//			map INT_MIN ... -1  to	0 ... INT_MAX
-//			map 0 ... INT_MAX   to	(INT_MAX + 1) ... UINT_MAX
-static inline void	ps_normalise_set_stack(int **integers, \
-						unsigned int *stack, unsigned int size)
+static inline bool	ps_parse(char const *argv[], t_ps_stack *s)
 {
-	unsigned int	i;
-	
-	i = -1;
-	while (++i < size)
-	{
-		if ((*integers)[i] >= 0)
-			stack[i] = (unsigned int)(*integers)[i] + INT_MAX + 1;
-		else	
-			stack[i] = (unsigned int)(*integers)[i] + INT_MIN;
-	}
-	ps_normalise_stack(stack, size);
-}
+	unsigned int	x;
+	unsigned int	y;
 
-static inline bool	ps_parse(int argc, char const *argv[], int **integers)
-{
-	int	x;
-	int	y;
-
-	(*integers) = malloc(argc * sizeof(int));
-	if (!(*integers))
-		return (false);
 	y = -1;
-	while (++y < argc && argv[y])
+	while (++y < s->size && argv[y])
 	{
 		x = -1;
 		if (argv[y][0] == '-' && (argv[y][1] >= '0' && argv[y][1] <= '9'))
 			x++;
 		while (argv[y][++x])
 			if (argv[y][x] < '0' || argv[y][x] > '9')
-				return (false);
-		(*integers)[y] = ft_atoi(argv[y]);
+				return (ft_printf("Error: invalid char argv[%u]\n", y), false);
+		s->origin[y] = ft_atoi(argv[y]);
 		x = -1;
 		while (++x < y)
-			if ((*integers)[x] == (*integers)[y])
-				return (false);
+			if (s->origin[x] == s->origin[y])
+				return (ft_printf("Error: dup argv[%u-%u]\n", y, x), false);
 	}
+	y = -1;
+	while (++y < s->size && argv[y] && s->origin[y] >= 0)
+		s->stack[y] = (unsigned int)s->origin[y] + INT_MAX + 1;
+	y = -1;
+	while (++y < s->size && argv[y] && s->origin[y] < 0)
+		s->stack[y] = (unsigned int)s->origin[y] + INT_MIN;
 	return (true);
 }
 
-static inline bool	ps_malloc(t_ps_stack *a, t_ps_stack *b,
-							  int **integers, int argc)
+static inline void	ps_free(t_ps_stack *s)
 {
-	integers = malloc(argc * sizeof(int));
-	if (!integers)
+	free(s->stack);
+	free(s->a_next);
+	free(s->a_prev);
+	free(s->b_next);
+	free(s->b_prev);
+	free(s->groups);
+	free(s->origin);
+}
+
+static inline bool	ps_malloc(t_ps_stack *s, int argc)
+{
+	s->origin = malloc(argc * sizeof(int));
+	if (!s->origin)
 		return (false);
-	a->stack = malloc(argc * sizeof(unsigned int));
-	if (!a->stack)
-		return (free(integers), false);
-	b->stack = malloc(argc * sizeof(unsigned int));
-	if (!b->stack)
-		return (free(integers), free(a->stack), false);
-	a->next = malloc(argc * sizeof(unsigned int));
-	if (!a->next)
-		return (free(integers), free(a->stack), free(b->stack), false);
-	a->prev = malloc(argc * sizeof(unsigned int));
-	if (!a->prev)
-		return (free(integers), free(a->stack), free(b->stack), free(a->next), \
-				false);
-	b->next = malloc(argc * sizeof(unsigned int));
-	if (!b->next)
-		return (free(integers), free(a->stack), free(b->stack), free(a->next), \
-				free(a->prev), false);
-	b->prev = malloc(argc * sizeof(unsigned int));
-	if (!b->prev)
-		return (free(integers), free(a->stack), free(b->stack), free(a->next), \
-				free(a->prev), free(b->next), false);
+	s->stack = malloc(argc * sizeof(unsigned int));
+	if (!s->stack)
+		return (free(s->origin), false);
+	s->groups = malloc(argc * sizeof(unsigned int));
+	if (!s->groups)
+		return (free(s->origin), free(s->stack), false);
+	s->a_next = malloc(argc * sizeof(unsigned int));
+	if (!s->a_next)
+		return (free(s->origin), free(s->stack), free(s->groups), false);
+	s->a_prev = malloc(argc * sizeof(unsigned int));
+	if (!s->a_prev)
+		return (free(s->origin), free(s->stack), free(s->groups), \
+				free(s->a_next), false);
+	s->b_next = malloc(argc * sizeof(unsigned int));
+	if (!s->b_next)
+		return (free(s->origin), free(s->stack), free(s->groups), \
+				free(s->a_next), free(s->a_prev), false);
+	s->b_prev = malloc(argc * sizeof(unsigned int));
+	if (!s->b_prev)
+		return (free(s->origin), free(s->stack), free(s->groups), \
+				free(s->a_next), free(s->a_prev), free(s->b_next), false);
 	return (true);
 }
 
 int	main(int argc, char const *argv[])
 {
-	t_ps_stack	a;
-	t_ps_stack	b;
-	int			*integers;
+	t_ps_stack	s;
 
 	if (argc < 2)
-		return (ft_printf("Error\n"), 1);
+		return (ft_printf("Error\n"), PS_ERROR);
 	argv++;
 	argc--;
-	if (!ps_malloc(&a, &b, &integers, argc))
-		return (ft_printf("Error\n"), 1);
-	if (!ps_parse(argc, argv, &integers))
-		return (ft_printf("Error\n"), 1);
-	ps_normalise_set_stack(&integers, a.stack, argc);
-	free(integers);
-	if (!ps_algorithm(&a, &b, (unsigned int)argc))
-		return (ft_printf("Error\n"), 1);
+	if (!ps_malloc(&s, argc))
+		return (ft_printf("Malloc Error\n"), PS_ERROR);
+	s.size = argc;
+	if (!ps_parse(argv, &s))
+		return (ps_free(&s), PS_ERROR);
+	ps_normalise(&s);
+	ps_algorithm(&s);
+	ps_free(&s);
 	return (0);
 }
