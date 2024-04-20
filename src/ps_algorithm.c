@@ -6,12 +6,18 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 17:47:45 by doligtha          #+#    #+#             */
-/*   Updated: 2024/04/20 22:05:51 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/04/21 00:10:15 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pushswap.h"
 #include "libft.h"
+#include <stdio.h>
+
+// void	ps_groupgroup()
+// {
+	
+// }
 
 //some value setting function;
 void 	ps_init(t_ps_stack *s)

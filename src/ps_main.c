@@ -6,12 +6,14 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 16:53:34 by doligtha          #+#    #+#             */
-/*   Updated: 2024/04/20 21:53:20 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/04/21 00:02:32 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pushswap.h"
 #include "libft.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <limits.h>
@@ -44,6 +46,10 @@ static inline void	ps_normalise(t_ps_stack *s)
 	}
 }
 
+//int to unsigned int:
+//	result = origin + (origin < 0 - INT_MAX - 1) * INT_MIN + INT_MAX + 1;
+//eq of:
+//	s
 static inline bool	ps_parse(char const *argv[], t_ps_stack *s)
 {
 	unsigned int	x;
@@ -65,11 +71,10 @@ static inline bool	ps_parse(char const *argv[], t_ps_stack *s)
 				return (ft_printf("Error: dup argv[%u-%u]\n", y, x), false);
 	}
 	y = -1;
-	while (++y < s->size && argv[y] && s->origin[y] >= 0)
-		s->stack[y] = (unsigned int)s->origin[y] + INT_MAX + 1;
-	y = -1;
-	while (++y < s->size && argv[y] && s->origin[y] < 0)
-		s->stack[y] = (unsigned int)s->origin[y] + INT_MIN;
+	while (++y < s->size)
+		s->stack[y] = s->origin[y] \
+					+ (s->origin[y] < 0) * INT_MIN \
+					+ (s->origin[y] >= 0) * ((unsigned int)INT_MAX + 1);
 	return (true);
 }
 
@@ -118,16 +123,16 @@ int	main(int argc, char const *argv[])
 	t_ps_stack	s;
 
 	if (argc < 2)
-		return (ft_printf("Error\n"), PS_ERROR);
+		return (ft_printf("Error: provide arguments\n"), PS_ERROR);
 	argv++;
 	argc--;
 	if (!ps_malloc(&s, argc))
-		return (ft_printf("Malloc Error\n"), PS_ERROR);
+		return (ft_printf("Error: malloc() failed\n"), PS_ERROR);
 	s.size = argc;
 	if (!ps_parse(argv, &s))
 		return (ps_free(&s), PS_ERROR);
 	ps_normalise(&s);
-	ps_algorithm(&s);
+	ps_init(&s);
 	ps_free(&s);
 	return (0);
 }

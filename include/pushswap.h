@@ -6,17 +6,12 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 16:53:22 by doligtha          #+#    #+#             */
-/*   Updated: 2024/04/20 21:50:29 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/04/20 23:15:19 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PUSHSWAP_H
 # define PUSHSWAP_H
-
-# include <math.h>
-# include <stdlib.h>
-# include <stdint.h>
-# include <stdbool.h>
 
 # ifndef PS_ERROR
 #  define PS_ERROR 1

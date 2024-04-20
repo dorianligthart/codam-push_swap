@@ -1,18 +1,17 @@
 NAME	 := push_swap
 NAME_BON := checker
 CFLAGS	 := -Wextra -Wall -Werror -Wunreachable-code -O3 -g#`-fsanitize=address
-LIBFT	 := ./libft
-LIBFT_A	 := ./libft/libft.a
+LIBFT	 := libft
+LIBFT_A	 := libft/libft.a
+BUILD	 := build/
 
 HEADERS	:= -I ./include -I $(LIBFT)/include
 LIBS	:= $(LIBFT_A) -lm
 
-SRC		:= $(shell find ./src -iname "*.c") #TODO: PROJECT_END: type out src
-OBJ		:= ${SRC:.c=.o}
-SRC_BON	:= $(shell find ./src_bonus -iname "*.c") #TODO: PROJECT_END: type out src_bonus
-OBJ_BON	:= ${SRC_BON:.c=.o}
-
-all: $(LIBFT_A) $(NAME)
+SRC		:= $(shell find src -iname "*.c") #TODO: PROJECT_END: type out src
+OBJ		:= $(addsuffix .o, $(basename $(SRC)))
+SRC_BON	:= $(shell find src_bonus -iname "*.c") #TODO: PROJECT_END: type out src_bonus
+OBJ_BON	:= $(addsuffix .o, $(basename $(SRC_BON)))
 
 $(LIBFT_A):
 	echo "libft.a has been deleted!"
@@ -20,23 +19,30 @@ $(LIBFT_A):
 %.o: %.c
 	@$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS)
 
-$(NAME): $(OBJ)
+$(BUILD):
+	mkdir -p $(BUILD)
+
+$(NAME): $(BUILD) $(OBJ)
 	@$(CC) $(OBJ) $(LIBS) $(HEADERS) -o $(NAME)
 
 $(NAME_BON): $(OBJ_BON)
 	@$(CC) $(OBJ_BON) $(LIBS) $(HEADERS) -o $(NAME_BON)
 
-clean:
-	@rm -rf $(OBJ)
-	@rm -rf $(OBJ_BON)
+all: $(LIBFT_A) $(NAME)
 
-bonus:
-	@$(CC) $(OBJ_BON) $(LIBS) $(HEADERS) -o $(NAME_BON)
+bonus: $(LIBFT_A) $(NAME_BON)
+
+clean:
+	rm -f $(OBJ)
+	rm -f $(OBJ_BON)
+	rm -d $(BUILD)
 
 fclean: clean
-	@rm -rf $(NAME)
-	@rm -rf $(NAME_BON)
+	rm -f $(BUILD)$(NAME)
+	rm -f $(BUILD)$(NAME_BON)
 
 re: fclean all
+
+rebonus: fclean bonus
 
 .PHONY: all, clean, fclean, re, libmlx
