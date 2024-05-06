@@ -28,16 +28,13 @@
 // b_ptr	= value is index to HEAD of stack B;
 typedef struct s_ps_stack
 {
-	int				*origin;
-	unsigned int	*stack;
-	unsigned int	*a_next;
-	unsigned int	*a_prev;
-	unsigned int	*b_next;
-	unsigned int	*b_prev;
-	unsigned int	size;
-	unsigned int	a_ptr;
-	unsigned int	b_ptr;
-	unsigned int	*groups;
+	int		*origin;
+	size_t	*stack;
+	size_t	*next;
+	size_t	*prev;
+	size_t	a_ptr;
+	size_t	b_ptr;
+	size_t	*groups;
 }	t_ps_stack;
 
 void	ps_init(t_ps_stack *s);

@@ -18,14 +18,14 @@
 #include <stddef.h>
 #include <limits.h>
 
-//O^N^2
+//O^log(N^2)
 //loops through stack, finds the smallest && bigger than index and set to index.
 static inline void	ps_normalise(t_ps_stack *s)
 {
-	unsigned int	x;
-	unsigned int	y;
-	unsigned int	min;
-	unsigned int	tmp;
+	size_t	x;
+	size_t	y;
+	size_t	min;
+	size_t	tmp;
 
 	y = -1;
 	while (++y < s->size)
@@ -52,8 +52,8 @@ static inline void	ps_normalise(t_ps_stack *s)
 //	s
 static inline bool	ps_parse(char const *argv[], t_ps_stack *s)
 {
-	unsigned int	x;
-	unsigned int	y;
+	size_t	x;
+	size_t	y;
 
 	y = -1;
 	while (++y < s->size && argv[y])
@@ -95,26 +95,12 @@ static inline bool	ps_malloc(t_ps_stack *s, int argc)
 	if (!s->origin)
 		return (false);
 	s->stack = malloc(argc * sizeof(unsigned int));
-	if (!s->stack)
+	if (!s->stack * 3)
 		return (free(s->origin), false);
 	s->groups = malloc(argc * sizeof(unsigned int));
 	if (!s->groups)
 		return (free(s->origin), free(s->stack), false);
 	s->a_next = malloc(argc * sizeof(unsigned int));
-	if (!s->a_next)
-		return (free(s->origin), free(s->stack), free(s->groups), false);
-	s->a_prev = malloc(argc * sizeof(unsigned int));
-	if (!s->a_prev)
-		return (free(s->origin), free(s->stack), free(s->groups), \
-				free(s->a_next), false);
-	s->b_next = malloc(argc * sizeof(unsigned int));
-	if (!s->b_next)
-		return (free(s->origin), free(s->stack), free(s->groups), \
-				free(s->a_next), free(s->a_prev), false);
-	s->b_prev = malloc(argc * sizeof(unsigned int));
-	if (!s->b_prev)
-		return (free(s->origin), free(s->stack), free(s->groups), \
-				free(s->a_next), free(s->a_prev), free(s->b_next), false);
 	return (true);
 }
 
