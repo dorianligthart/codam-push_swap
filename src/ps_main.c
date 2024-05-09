@@ -6,7 +6,7 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 16:53:34 by doligtha          #+#    #+#             */
-/*   Updated: 2024/04/21 00:02:32 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/05/09 03:29:26 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,46 +17,71 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <limits.h>
+#include <stdint.h> //SIZE_MAX
 
 //O^N^2
 //loops through stack, finds the smallest && bigger than index and set to index.
-static inline void	ps_normalise(t_ps_stack *s)
+//messes up data if there are duplicates.
+void	ps_normalise(size_t *dst, size_t size)
 {
-	unsigned int	x;
-	unsigned int	y;
-	unsigned int	min;
-	unsigned int	tmp;
+	size_t	x;
+	size_t	y;
+	size_t	min;
+	size_t	tmp;
 
-	y = -1;
-	while (++y < s->size)
+	y = 0;
+	while (y < size)
 	{
-		x = -1;
-		min = UINT_MAX;
-		while (++x < s->size)
+		x = 0;
+		min = SIZE_MAX;
+		while (x < size)
 		{
-			if ((min > s->stack[x]
-				|| (y == s->size - 1 && s->stack[x] == UINT_MAX))
-				&& y <= s->stack[x])
+			if ((min > dst[x]
+				|| (y == size - 1 && dst[x] == SIZE_MAX))
+				&& y <= dst[x])
 			{
-				min = s->stack[x];
+				min = dst[x];
 				tmp = x;
 			}
+			x++;
 		}
-		s->stack[tmp] = y;
+		dst[tmp] = y;
+		y++;
 	}
 }
 
-//int to unsigned int:
-//	result = origin + (origin < 0 - INT_MAX - 1) * INT_MIN + INT_MAX + 1;
-//eq of:
-//	s
-static inline bool	ps_parse(char const *argv[], t_ps_stack *s)
+//links indexes together using 2 'next' and 'previous' arrays.
+//Values in src, will be used as indexes in next and prev,
+//sets HEAD of converted stack to *size;
+//return false when 
+bool	ps_array2dcll(size_t *prev, size_t *next, size_t *src, size_t *size)
 {
-	unsigned int	x;
-	unsigned int	y;
+	size_t	head;
+	size_t	x;
+	size_t	y;
+
+	ps_normalise(src, *size);
+	head = src[0];
+	x = 0;
+	y = 0;
+	while (x < *size)
+	{
+		//TODO: decide on data struct, see header!
+		prev[x] = src[x];
+		next[x] = src[x];
+	}
+	*size = head;
+	return (true);
+}
+
+// return false on duplicate.
+bool	ft_argv_to_int(size_t argc, char const *argv[], int *src)
+{
+	size_t	x;
+	size_t	y;
 
 	y = -1;
-	while (++y < s->size && argv[y])
+	while (++y < argc && argv[y])
 	{
 		x = -1;
 		if (argv[y][0] == '-' && (argv[y][1] >= '0' && argv[y][1] <= '9'))
@@ -64,75 +89,73 @@ static inline bool	ps_parse(char const *argv[], t_ps_stack *s)
 		while (argv[y][++x])
 			if (argv[y][x] < '0' || argv[y][x] > '9')
 				return (ft_printf("Error: invalid char argv[%u]\n", y), false);
-		s->origin[y] = ft_atoi(argv[y]);
+		src[y] = ft_atoi(argv[y]);
 		x = -1;
 		while (++x < y)
-			if (s->origin[x] == s->origin[y])
-				return (ft_printf("Error: dup argv[%u-%u]\n", y, x), false);
+			if (src[x] == src[y])
+				return (ft_printf("Error: dup argv[%i-%i]\n", y, x), false);
 	}
-	y = -1;
-	while (++y < s->size)
-		s->stack[y] = s->origin[y] \
-					+ (s->origin[y] < 0) * INT_MIN \
-					+ (s->origin[y] >= 0) * ((unsigned int)INT_MAX + 1);
 	return (true);
 }
 
-static inline void	ps_free(t_ps_stack *s)
+
+//int to unsigned int:
+//		result = n + (n < 0 - INT_MAX - 1) * INT_MIN + INT_MAX + 1;
+//or	result = n + (n < 0) * INT_MIN + (n >= 0) * ((unsigned int)INT_MAX + 1);
+static int	main2(size_t argc, char const *argv[])
 {
-	free(s->stack);
-	free(s->a_next);
-	free(s->a_prev);
-	free(s->b_next);
-	free(s->b_prev);
-	free(s->groups);
-	free(s->origin);
+	t_dcllist	s;
+	int			*src;
+	size_t		*dst;
+	size_t		i;
+
+	src = (int *)malloc(argc * sizeof(int));
+	if (src == NULL)
+		return (PS_ERROR);
+	dst = (size_t *)malloc(argc * 4 * sizeof(size_t));
+	if (dst == NULL)
+		return (free(src), PS_ERROR);
+	s.next = dst + argc;
+	s.prev = dst + (argc * 2);
+	if (false == ft_argv_to_int(argc, argv, src))
+		return (free(src), free(dst), PS_ERROR);
+	i = -1;
+	while (++i < argc)
+		dst[i] = src[i] + ((src[i] < 0) - INT_MIN) * INT_MIN + INT_MAX + 1;
+	i = ps_array2dcll(s.prev, s.next, dst, &argc);
+	if (false == ps_algorithm(&s, i))
+		return (free(src), free(dst), PS_ERROR);
+	return (free(src), free(dst), PS_SUCCESS);
 }
 
-static inline bool	ps_malloc(t_ps_stack *s, int argc)
-{
-	s->origin = malloc(argc * sizeof(int));
-	if (!s->origin)
-		return (false);
-	s->stack = malloc(argc * sizeof(unsigned int));
-	if (!s->stack)
-		return (free(s->origin), false);
-	s->groups = malloc(argc * sizeof(unsigned int));
-	if (!s->groups)
-		return (free(s->origin), free(s->stack), false);
-	s->a_next = malloc(argc * sizeof(unsigned int));
-	if (!s->a_next)
-		return (free(s->origin), free(s->stack), free(s->groups), false);
-	s->a_prev = malloc(argc * sizeof(unsigned int));
-	if (!s->a_prev)
-		return (free(s->origin), free(s->stack), free(s->groups), \
-				free(s->a_next), false);
-	s->b_next = malloc(argc * sizeof(unsigned int));
-	if (!s->b_next)
-		return (free(s->origin), free(s->stack), free(s->groups), \
-				free(s->a_next), free(s->a_prev), false);
-	s->b_prev = malloc(argc * sizeof(unsigned int));
-	if (!s->b_prev)
-		return (free(s->origin), free(s->stack), free(s->groups), \
-				free(s->a_next), free(s->a_prev), free(s->b_next), false);
-	return (true);
-}
-
+//gotta love bash!  `./program arg1 arg2 arg3`
+//		is abs not: `./program "arg1 arg2 arg3"`
+//Q: Do I support one or the other, or both?
+//A: First one works, second one: ft_split_with_delims() isn't implemented yet.
 int	main(int argc, char const *argv[])
 {
-	t_ps_stack	s;
+	bool	one_arg;
+	size_t	argcsize;
+	int		tmp;
 
 	if (argc < 2)
-		return (ft_printf("Error: provide arguments\n"), PS_ERROR);
+		return (write(1, "Error: provide arguments!\n", 26), PS_ERROR);
 	argv++;
 	argc--;
-	if (!ps_malloc(&s, argc))
-		return (ft_printf("Error: malloc() failed\n"), PS_ERROR);
-	s.size = argc;
-	if (!ps_parse(argv, &s))
-		return (ps_free(&s), PS_ERROR);
-	ps_normalise(&s);
-	ps_init(&s);
-	ps_free(&s);
-	return (0);
+	argcsize = ((argc >= 0) * 2 - 1) * argc;
+	one_arg = false;
+	if (argcsize == 1)
+	{
+		one_arg = true;
+		argv = (char const **)ft_split_with_delims(argv[1], " \f\n\r\t\v");
+		if (argv == NULL)
+			return (write(1, "Error: malloc failure\n", 22), PS_ERROR);
+		argcsize = 0;
+		while (argv[argcsize] != NULL)
+			argcsize++;
+	}
+	tmp = main2(argcsize, argv);
+	if (one_arg == true)
+		return (ft_free((void *)argv), free((void *)argv), tmp);
+	return (tmp);
 }

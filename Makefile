@@ -1,6 +1,6 @@
 NAME	 := push_swap
 NAME_BON := checker
-CFLAGS	 := -Wextra -Wall -Werror -Wunreachable-code -O3 -g#`-fsanitize=address
+CFLAGS	 := -Wextra -Wall -Werror -Wunreachable-code -O3 -g#-fsanitize=address
 LIBFT	 := libft
 LIBFT_A	 := libft/libft.a
 BUILD	 := build/
@@ -45,4 +45,4 @@ re: fclean all
 
 rebonus: fclean bonus
 
-.PHONY: all, clean, fclean, re, libmlx
+.PHONY: all clean fclean re 

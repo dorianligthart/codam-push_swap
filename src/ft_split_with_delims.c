@@ -1,37 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ps_rotate.c                                        :+:      :+:    :+:   */
+/*   ft_split_with_delims.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/11 16:26:58 by doligtha          #+#    #+#             */
-/*   Updated: 2024/05/09 01:23:15 by doligtha         ###   ########.fr       */
+/*   Created: 2024/05/08 23:55:06 by doligtha          #+#    #+#             */
+/*   Updated: 2024/05/09 03:25:41 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pushswap.h"
+#include <stddef.h>
+#include <unistd.h>
 
-bool ps_ra(t_dcllist *s)
+//TODO: implement ft_split_with_delims();
+//isspace() characters:
+//(' '), ('\f'), ('\n'), ('\r'), ('\t'), ('\v')
+char	**ft_split_with_delims(const char *src, const char *delims)
 {
-	(void)s;
-	if (-1 == write(1, "ra\n", 3))
-		return (false);
-	return (true);
-}
-
-bool ps_rb(t_dcllist *s)
-{
-	(void)s;
-	if (-1 == write(1, "rb\n", 3))
-		return (false);
-	return (true);
-}
-
-bool ps_rr(t_dcllist *s)
-{
-	(void)s;
-	if (-1 == write(1, "rr\n", 3))
-		return (false);
-	return (true);
+	write(1, "Single string parsing not implemented yet\n", 42);
+	(void)src;
+	(void)delims;
+	return (NULL);
 }

@@ -6,32 +6,47 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 17:47:45 by doligtha          #+#    #+#             */
-/*   Updated: 2024/04/21 00:10:15 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/05/09 03:29:23 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pushswap.h"
 #include "libft.h"
-#include <stdio.h>
+#include <stdint.h>
 
-// void	ps_groupgroup()
-// {
-	
-// }
+void	ps_printstacks(t_dcllist *s, size_t a, size_t b)
+{
+	size_t ptr;
+
+	ft_printf("A_HEAD = %u\n", a);
+	ptr = a;
+	while (s->next[ptr] != a)
+	{
+		ft_printf("\n[");
+		ft_printf("%u\t", ptr);
+		ft_printf("%u\t", s->next[ptr]);
+		ft_printf("%u\t", s->prev[ptr]);
+		ft_printf("]\n");
+		ptr = s->next[ptr];
+	}
+	ft_printf("B_HEAD = %u\n", b);
+	ptr = b;
+	while (s->next[ptr] != a)
+	{
+		ft_printf("\n[");
+		ft_printf("%u\t", ptr);
+		ft_printf("%u\t", s->next[ptr]);
+		ft_printf("%u\t", s->prev[ptr]);
+		ft_printf("]\n");
+		ptr = s->next[ptr];
+	}
+}
 
 //some value setting function;
-void 	ps_init(t_ps_stack *s)
+//	- b initialised as SIZE_MAX meaning it's empty;
+bool	ps_algorithm(t_dcllist *s, size_t a)
 {
-	unsigned int	i;
-
-	s->a_ptr = 0;
-	s->b_ptr = s->size;
-	i = -1;
-	while (++i < s->size)
-	{
-		s->a_next[i] = (i + 1) % s->size;
-		s->a_prev[i] = (i - 1) % s->size;
-		s->b_next[i] = 0;
-		s->b_prev[i] = 0;
-	}
+	ps_pa(s);
+	ps_printstacks(s, a, SIZE_MAX);
+	return (true);
 }

@@ -6,23 +6,32 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 16:27:55 by doligtha          #+#    #+#             */
-/*   Updated: 2024/04/20 21:30:08 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/05/09 01:23:11 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pushswap.h"
 
-void ps_rra(t_ps_stack *s)
+bool	ps_rra(t_dcllist *s)
 {
 	(void)s;
+	if (-1 == write(1, "rra\n", 4))
+		return (false);
+	return (true);
 }
 
-void ps_rrb(t_ps_stack *s)
+bool	ps_rrb(t_dcllist *s)
 {
 	(void)s;
+	if (-1 == write(1, "rrb\n", 4))
+		return (false);
+	return (true);
 }
 
-void ps_rrr(t_ps_stack *s)
+bool	ps_rrr(t_dcllist *s)
 {
 	(void)s;
+	if (-1 == write(1, "rrr\n", 4))
+		return (false);
+	return (true);
 }
