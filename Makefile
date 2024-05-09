@@ -1,6 +1,6 @@
 NAME	 := push_swap
-NAME_BON := checker
-CFLAGS	 := -Wextra -Wall -Werror -Wunreachable-code -O3 -g#-fsanitize=address
+NAME_BON := checker_linux
+CFLAGS	 := -Wextra -Wall -Werror -Wunreachable-code -O3 -g #-fsanitize=address
 LIBFT	 := libft
 LIBFT_A	 := libft/libft.a
 BUILD	 := build/

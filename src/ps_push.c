@@ -1,53 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ps_push_swap.c                                     :+:      :+:    :+:   */
+/*   ps_push.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/11 16:24:45 by doligtha          #+#    #+#             */
-/*   Updated: 2024/05/09 01:23:07 by doligtha         ###   ########.fr       */
+/*   Created: 2024/05/09 04:44:59 by doligtha          #+#    #+#             */
+/*   Updated: 2024/05/09 10:24:15 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pushswap.h"
 
-bool	ps_pa(t_dcllist *s)
+bool	ps_pa(size_t *prev, size_t *next, t_ps_stack *stack)
 {
-	(void)s;
+	(void)prev;
+	(void)next;
+	(void)stack;
 	if (-1 == write(1, "pa\n", 3))
 		return (false);
 	return (true);
 }
 
-bool	ps_pb(t_dcllist *s)
+bool	ps_pb(size_t *prev, size_t *next, t_ps_stack *stack)
 {
-	(void)s;
+	(void)prev;
+	(void)next;
+	(void)stack;
 	if (-1 == write(1, "pb\n", 3))
-		return (false);
-	return (true);
-}
-
-bool	ps_sa (t_dcllist *s)
-{
-	(void)s;
-	if (-1 == write(1, "sa\n", 3))
-		return (false);
-	return (true);
-}
-
-bool	ps_sb (t_dcllist *s)
-{
-	(void)s;
-	if (-1 == write(1, "sb\n", 3))
-		return (false);
-	return (true);
-}
-
-bool	ps_ss (t_dcllist *s)
-{
-	(void)s;
-	if (-1 == write(1, "ss\n", 3))
 		return (false);
 	return (true);
 }

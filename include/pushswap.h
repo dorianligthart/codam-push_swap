@@ -6,7 +6,7 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 16:53:22 by doligtha          #+#    #+#             */
-/*   Updated: 2024/05/09 03:29:19 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/05/09 10:30:20 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,40 +28,44 @@
 #include <unistd.h>
 #include <stdbool.h>
 
+typedef struct s_ps_stack
+{
+	size_t	a;
+	size_t	b;
+	size_t	size;
+	size_t	total_move_count;
+}	t_ps_stack;
+
 //DOUBLE CIRCULAR LINKED LIST, VIEWED AS ARRAYS.
 //	- next[size], values pointing to the next in the list;
 //	- prev[size], values pointing to the previous in the list; 
-typedef struct s_dcllist
-{
-	size_t		*next;
-	size_t		*prev;
-	size_t		size;
-}	t_dcllist;
 //example:
-//	normal_list		= [4, 1, 3, 0, 2];
-//	index_val_swap	= [3, 1, 4, 2, 0];
-//	next			= [2, 3, 4, 0, 1];
-//	prev			= [3, 4, 0, 1, 2];
-//						\/ swap
-// this trick is done to let the data be small so we dont have much code. 
+//	size = 5;
+//	a	 = 2;
+//	list = [4, 1, 3, 0, 2];
+//	next = [1, 2, 3, 4, 0];
+//	prev = [4, 0, 1, 2, 3];
+//lets introduce b [2..4]:
+//	a	 = 2;
+//	b	 = 3;
+//	list = [4, 1, 3, 0, 2];
+//	next = [1, 0, 3, 4, 2];
+//	prev = [1, 0, 4, 2, 3];
+//
+//this trick is done to let the data be small and we dont have much code.
 
-	// size_t	range_count;
-	// size_t	range_size;
-	// size_t	range_mod;
-
-void	ps_printstacks(t_dcllist *s, size_t a, size_t b);
-bool	ps_algorithm(t_dcllist *s, size_t a);
-
-bool	ps_pa(t_dcllist *s);
-bool	ps_pb(t_dcllist *s);
-bool	ps_sa(t_dcllist *s);
-bool	ps_sb(t_dcllist *s);
-bool	ps_ss(t_dcllist *s);
-bool	ps_ra(t_dcllist *s);
-bool	ps_rb(t_dcllist *s);
-bool	ps_rr(t_dcllist *s);
-bool	ps_rra(t_dcllist *s);
-bool	ps_rrb(t_dcllist *s);
-bool	ps_rrr(t_dcllist *s);
+void	printstacks(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_algorithm(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_pa(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_pb(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_sa(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_sb(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_ss(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_ra(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_rb(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_rr(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_rra(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_rrb(size_t *prev, size_t *next, t_ps_stack *stack);
+bool	ps_rrr(size_t *prev, size_t *next, t_ps_stack *stack);
 
 #endif //PUSHSWAP_H

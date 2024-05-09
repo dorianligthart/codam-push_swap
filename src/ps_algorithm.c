@@ -6,7 +6,7 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 17:47:45 by doligtha          #+#    #+#             */
-/*   Updated: 2024/05/09 03:29:23 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/05/09 10:11:44 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,39 +14,32 @@
 #include "libft.h"
 #include <stdint.h>
 
-void	ps_printstacks(t_dcllist *s, size_t a, size_t b)
+void	ps_printstacks(size_t *prev, size_t *next, t_ps_stack *stack)
 {
 	size_t ptr;
 
-	ft_printf("A_HEAD = %u\n", a);
-	ptr = a;
-	while (s->next[ptr] != a)
+	(void)prev;
+	printf("A_HEAD = %zu\n", stack->a);
+	ptr = stack->a;
+	while (ptr != SIZE_MAX && next[ptr] != ptr)
 	{
-		ft_printf("\n[");
-		ft_printf("%u\t", ptr);
-		ft_printf("%u\t", s->next[ptr]);
-		ft_printf("%u\t", s->prev[ptr]);
-		ft_printf("]\n");
-		ptr = s->next[ptr];
-	}
-	ft_printf("B_HEAD = %u\n", b);
-	ptr = b;
-	while (s->next[ptr] != a)
-	{
-		ft_printf("\n[");
-		ft_printf("%u\t", ptr);
-		ft_printf("%u\t", s->next[ptr]);
-		ft_printf("%u\t", s->prev[ptr]);
-		ft_printf("]\n");
-		ptr = s->next[ptr];
+		printf("[");
+		printf("%zu, ", ptr);
+		printf("%zu, ", next[ptr]);
+		printf("%zu", prev[ptr]);
+		printf("]\n");
+		ptr = next[ptr];
 	}
 }
 
 //some value setting function;
 //	- b initialised as SIZE_MAX meaning it's empty;
-bool	ps_algorithm(t_dcllist *s, size_t a)
+bool	ps_algorithm(size_t *prev, size_t *next, t_ps_stack *stack)
 {
-	ps_pa(s);
-	ps_printstacks(s, a, SIZE_MAX);
+	stack->b = SIZE_MAX;
+	stack->a = 1;
+	// stack->a = stack->size - 1;
+	ps_sa(prev, next, stack);
+	// ps_printstacks(prev, next, stack);
 	return (true);
 }
