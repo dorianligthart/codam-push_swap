@@ -6,7 +6,7 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 16:53:22 by doligtha          #+#    #+#             */
-/*   Updated: 2024/05/09 10:30:20 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/05/16 18:07:34 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,16 @@
 
 #include <unistd.h>
 #include <stdbool.h>
+
+//variable names for double circular linked list 'nodes'.
+enum e_ps_pushswap
+{
+	PS_A,
+	PS_B,
+	PS_C,
+	PS_D,
+	PS_COUNT,
+};
 
 typedef struct s_ps_stack
 {

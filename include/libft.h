@@ -6,7 +6,7 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 19:09:51 by doligtha          #+#    #+#             */
-/*   Updated: 2024/05/09 03:12:59 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/05/10 09:35:51 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,6 @@ char	*ft_strstr(const char *big, const char *little);
 char	*ft_strrstr(const char *big, const char *little);
 void	ft_free(void **ptr);
 void	ft_mapchr(char **map, char c, size_t *x, size_t *y);
-char	**ft_split_with_delims(const char *src, const char *delims);
 
 //gnl:
 # ifndef BUFFER_SIZE

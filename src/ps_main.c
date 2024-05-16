@@ -6,7 +6,7 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 16:53:34 by doligtha          #+#    #+#             */
-/*   Updated: 2024/05/09 09:10:59 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/05/16 17:57:35 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ static void	normalise_size(size_t *dst, size_t size)
 	size_t	min;
 	size_t	tmp;
 
+	tmp = 0;
 	y = 0;
 	while (y < size)
 	{
@@ -54,23 +55,22 @@ static void	normalise_size(size_t *dst, size_t size)
 //Values in src, will be used as indexes in next and prev,
 //sets HEAD of converted stack to *size;
 //returns false on error;
-static bool	size_to_linked_list_array(size_t *prev, size_t *next,\
+static void	size_to_linked_list_array(size_t *prev, size_t *next,\
                                       size_t *src, t_ps_stack *stack)
 {
 	size_t	x;
-	size_t	y;
+	// size_t	y;
 
 	stack->a = src[0];
-	normalise_size(src, stack->size);
+	stack->b = SIZE_MAX;
 	x = 0;
-	y = 0;
+	// y = 0;
 	while (x < stack->size)
 	{
 		prev[x] = x + (x == 0) * stack->size - 1;
 		next[x] = (x + 1) % stack->size;
 		x++;
 	}
-	return (true);
 }
 
 // return false on duplicate/invalid character [0-9\-]
@@ -83,12 +83,15 @@ static bool	argv_to_int_to_size(size_t argc, char const *argv[],\
 	y = -1;
 	while (++y < argc && argv[y])
 	{
-		x = -1;
+		x = 0;
 		if (argv[y][0] == '-' && (argv[y][1] >= '0' && argv[y][1] <= '9'))
 			x++;
-		while (argv[y][++x])
+		while (argv[y][x])
+		{
 			if (argv[y][x] < '0' || argv[y][x] > '9')
 				return (ft_printf("Error: invalid char argv[%u]\n", y), false);
+			x++;
+		}
 		src[y] = ft_atoi(argv[y]);
 		x = -1;
 		while (++x < y)
@@ -122,47 +125,45 @@ static int	main2(size_t argc, char const *argv[])
 	prev = dst + argc;
 	next = dst + argc * 2;
 	stack.size = argc;
-	if (false == argv_to_int_to_size(argc, argv, src, dst)
-		|| false == size_to_linked_list_array(prev, next, dst, &stack)
-		|| false == ps_algorithm(prev, next, &stack))
+	if (false == argv_to_int_to_size(argc, argv, src, dst))
 		return (free(src), free(dst), PS_ERROR);
-	for (size_t i = 0; i < argc; i++) printf("%zu ", dst[i]);
-	printf(" = dst[]\n");
-	for (size_t i = 0; i < argc; i++) printf("%zu ", next[i]);
-	printf(" = next[]\n2 3 1 4 5 6 0\n");
-	for (size_t i = 0; i < argc; i++) printf("%zu ", prev[i]);
-	printf(" = prev[]\n6 2 0 1 3 4 5\n");
+	normalise_size(dst, stack.size);
+	size_to_linked_list_array(prev, next, dst, &stack);
+	if (false == ps_algorithm(prev, next, &stack))
+		return (free(src), free(dst), PS_ERROR);
+	printf("\ni:   dst:  next:  prev:\n");
+	for (size_t i = 0; i < argc; i++)
+		printf("[%lu]%5zu, %5zu, %5zu,\n", i, dst[i], next[i], prev[i]);
 	return (free(src), free(dst), PS_SUCCESS);
 }
 
-//gotta love bash!  `./program arg1 arg2 arg3`
-//		is abs not: `./program "arg1 arg2 arg3"`
-//Q: Do I support one or the other, or both?
-//A: First one works, second one: ft_split_with_delims() isn't implemented yet.
+//gotta love bash!        `./program arg1 arg2 arg3`
+//is abs not the same as: `./program "arg1 arg2 arg3"`
 int	main(int argc, char const *argv[])
 {
 	bool	one_arg;
-	size_t	argcount;
 	int		tmp;
 
 	if (argc < 2)
-		return (write(1, "Error: provide arguments!\n", 26), PS_ERROR);
+		return (ft_printf("Error: provide arguments!\n"), PS_ERROR);
 	argv++;
 	argc--;
-	argcount = ((argc >= 0) * 2 - 1) * argc;
 	one_arg = false;
-	if (argcount == 1)
+	if (argc == 1)
 	{
+		argv[0] = ft_strdup(argv[0]);
+		if (argv[0] == NULL)
+			return (PS_ERROR);
 		one_arg = true;
-		argv = (char const **)ft_split_with_delims(argv[1], " \f\n\r\t\v");
+		argv = (char const **)ft_split(argv[0], ' ');
 		if (argv == NULL)
-			return (write(1, "Error: malloc failure\n", 22), PS_ERROR);
-		argcount = 0;
-		while (argv[argcount] != NULL)
-			argcount++;
+			return (ft_printf("Error: malloc failure\n"), PS_ERROR);
+		argc = 0;
+		while (argv[argc] != NULL)
+			argc++;
 	}
-	tmp = main2(argcount, argv);
+	tmp = main2(((size_t)((argc >= 0) * 2 - 1) * argc), argv);
 	if (one_arg == true)
-		return (ft_free((void *)argv), free((void *)argv), tmp);
+		return (ft_free((void *)argv), free((char *)argv), tmp);
 	return (tmp);
 }

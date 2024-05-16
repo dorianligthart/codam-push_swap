@@ -1,10 +1,10 @@
 NAME	 := push_swap
 NAME_BON := checker_linux
-CFLAGS	 := -Wextra -Wall -Werror -Wunreachable-code -O3 -g #-fsanitize=address
+CFLAGS	 := -Wextra -Wall -Werror -Wunreachable-code
 LIBFT	 := libft
 LIBFT_A	 := libft/libft.a
 BUILD	 := build/
-
+CC       := gcc
 HEADERS	:= -I ./include -I $(LIBFT)/include
 LIBS	:= $(LIBFT_A) -lm
 
@@ -15,34 +15,24 @@ OBJ_BON	:= $(addsuffix .o, $(basename $(SRC_BON)))
 
 $(LIBFT_A):
 	echo "libft.a has been deleted!"
-
 %.o: %.c
-	@$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS)
+	$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS)
 
-$(BUILD):
-	mkdir -p $(BUILD)
-
-$(NAME): $(BUILD) $(OBJ)
-	@$(CC) $(OBJ) $(LIBS) $(HEADERS) -o $(NAME)
+$(NAME): $(OBJ)
+	$(CC) $(OBJ) $(LIBS) $(HEADERS) -o $(NAME)
 
 $(NAME_BON): $(OBJ_BON)
-	@$(CC) $(OBJ_BON) $(LIBS) $(HEADERS) -o $(NAME_BON)
+	$(CC) $(OBJ_BON) $(LIBS) $(HEADERS) -o $(NAME_BON)
 
 all: $(LIBFT_A) $(NAME)
-
 bonus: $(LIBFT_A) $(NAME_BON)
-
 clean:
-	rm -f $(OBJ)
-	rm -f $(OBJ_BON)
-	rm -d $(BUILD)
-
+	rm -f $(OBJ) $(OBJ_BON)
 fclean: clean
-	rm -f $(BUILD)$(NAME)
-	rm -f $(BUILD)$(NAME_BON)
-
+	rm -f $(NAME) $(NAME_BON)
 re: fclean all
 
-rebonus: fclean bonus
+# fsanitize: CFLAGS += -g -fsanitize=address 
+# fsanitize: re
 
 .PHONY: all clean fclean re 
