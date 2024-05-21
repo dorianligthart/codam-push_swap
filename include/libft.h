@@ -35,7 +35,7 @@
 # endif //defined(...)
 
 # ifndef VA_FORBIDDEN
-#  include "printf.h"
+// #  include "printf.h"
 
 int		ft_printf(const char *format, ...);
 # endif
@@ -127,6 +127,7 @@ char	*ft_strstr(const char *big, const char *little);
 char	*ft_strrstr(const char *big, const char *little);
 void	ft_free(void **ptr);
 void	ft_mapchr(char **map, char c, size_t *x, size_t *y);
+size_t	ft_countwords(const char *str, const char *delims);
 
 //gnl:
 # ifndef BUFFER_SIZE

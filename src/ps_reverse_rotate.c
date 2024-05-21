@@ -16,9 +16,12 @@ bool	ps_rra(size_t *prev, size_t *next, t_ps_stack *stack)
 {
 	(void)next;
 	stack->a = prev[stack->a];
-	if (-1 == write(1, "rra\n", 4))
-		return (false);
-	stack->total_move_count++;
+	if (stack->print == true)
+	{
+		stack->total_move_count++;
+		if (write(1, "rra\n", 4) == -PS_ERROR)
+			return (false);
+	}
 	return (true);
 }
 
@@ -26,9 +29,12 @@ bool	ps_rrb(size_t *prev, size_t *next, t_ps_stack *stack)
 {
 	(void)next;
 	stack->b = prev[stack->b];
-	if (-1 == write(1, "rrb\n", 4))
-		return (false);
-	stack->total_move_count++;
+	if (stack->print == true)
+	{
+		stack->total_move_count++;
+		if (write(1, "rrb\n", 4) == -PS_ERROR)
+			return (false);
+	}
 	return (true);
 }
 
@@ -37,8 +43,11 @@ bool	ps_rrr(size_t *prev, size_t *next, t_ps_stack *stack)
 	(void)next;
 	stack->b = prev[stack->b];
 	stack->a = prev[stack->a];
-	if (-1 == write(1, "rrr\n", 4))
-		return (false);
-	stack->total_move_count++;
+	if (stack->print == true)
+	{
+		stack->total_move_count++;
+		if (write(1, "rrr\n", 4) == -PS_ERROR)
+			return (false);
+	}
 	return (true);
 }

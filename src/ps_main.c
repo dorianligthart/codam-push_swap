@@ -19,7 +19,25 @@
 #include <limits.h>
 #include <stdint.h> //SIZE_MAX
 
-//O^N^2
+//s->size needs to be set.
+static void	ps_init(size_t *src, size_t *prev, size_t *next, t_ps_stack *s)
+{
+	size_t	i;
+
+	i = -1;
+	while (++i < s->size)
+	{
+		prev[src[i]] = src[i + (i == 0) * s->size - 1];
+		next[src[i]] = src[(i + 1) % s->size];
+	}
+	s->print = false;
+	s->fd = 1;
+	s->total_move_count = 0;
+	s->a = src[0];
+	s->b = SIZE_MAX;
+}
+
+//O*N^2
 //loops through stack, finds the smallest && bigger than index and set to index.
 //messes up data if there are duplicates.
 static void	normalise_size(size_t *dst, size_t size)
@@ -51,119 +69,118 @@ static void	normalise_size(size_t *dst, size_t size)
 	}
 }
 
-//links indexes together using 2 'next' and 'previous' arrays.
-//Values in src, will be used as indexes in next and prev,
-//sets HEAD of converted stack to *size;
-//returns false on error;
-static void	size_to_linked_list_array(size_t *prev, size_t *next,\
-                                      size_t *src, t_ps_stack *stack)
+static size_t	str_to_uints(const char *str, unsigned int *uint, size_t y)
 {
 	size_t	x;
-	// size_t	y;
+	int		tmp;
 
-	stack->a = src[0];
-	stack->b = SIZE_MAX;
-	x = 0;
-	// y = 0;
-	while (x < stack->size)
+	while (*str != '\0')
 	{
-		prev[x] = x + (x == 0) * stack->size - 1;
-		next[x] = (x + 1) % stack->size;
-		x++;
-	}
-}
-
-// return false on duplicate/invalid character [0-9\-]
-static bool	argv_to_int_to_size(size_t argc, char const *argv[],\
-                                  int *src, size_t *dst)
-{
-	size_t	x;
-	size_t	y;
-
-	y = -1;
-	while (++y < argc && argv[y])
-	{
-		x = 0;
-		if (argv[y][0] == '-' && (argv[y][1] >= '0' && argv[y][1] <= '9'))
-			x++;
-		while (argv[y][x])
-		{
-			if (argv[y][x] < '0' || argv[y][x] > '9')
-				return (ft_printf("Error: invalid char argv[%u]\n", y), false);
-			x++;
-		}
-		src[y] = ft_atoi(argv[y]);
+		while (ft_strchr(" \n\v\t\r", *str))
+			str++;
+		x = (str[0] == '-' && (str[1] >= '0' && str[1] <= '9'));
+		if (str[x] < '0' || str[x] > '9')
+			return (0);
+		tmp = ft_atoi(str);
+		uint[y] = tmp + (tmp < 0) * INT_MIN
+				+ (tmp >= 0) * ((unsigned int)INT_MAX + 1);
+		str += x;
+		while (*str >= '0' && *str <= '9')
+			str++;
 		x = -1;
 		while (++x < y)
-			if (src[x] == src[y])
-				return (ft_printf("Error: dup argv[%i-%i]\n", y, x), false);
+			if (uint[x] == uint[y])
+				return (0);
+		y++;
 	}
-	y = -1;
-	while (++y < argc)
-		dst[y] = src[y] + (src[y] < 0) * INT_MIN + (src[y] >= 0) * ((unsigned int)INT_MAX + 1);
-	return (true);
+	return (y);
 }
-
 
 //int to unsigned int:
 //		result = n + (n < 0 - INT_MAX - 1) * INT_MIN + INT_MAX + 1;
 //or	result = n + (n < 0) * INT_MIN + (n >= 0) * ((unsigned int)INT_MAX + 1);
-static int	main2(size_t argc, char const *argv[])
+static int	main2(unsigned int *uints, t_ps_stack *s)
 {
-	int			*src;
-	size_t		*dst;
-	size_t		*next;
-	size_t		*prev;
-	t_ps_stack	stack;
+	size_t	*prev;
+	size_t	*next;
+	size_t	*src;
+	size_t	i;
 
-	src = (int *)malloc(argc * sizeof(int));
+	src = (size_t *)malloc(s->size * sizeof(size_t));
 	if (src == NULL)
-		return (PS_ERROR);
-	dst = (size_t *)malloc(argc * 3 * sizeof(size_t));
-	if (dst == NULL)
+		return (free(uints), PS_ERROR);
+	i = -1;
+	while (++i < s->size)
+		src[i] = (size_t)uints[i];
+	free(uints);
+	normalise_size(src, s->size);
+	prev = (size_t *)malloc((2 * s->size) * sizeof(size_t));
+	if (prev == NULL)
 		return (free(src), PS_ERROR);
-	prev = dst + argc;
-	next = dst + argc * 2;
-	stack.size = argc;
-	if (false == argv_to_int_to_size(argc, argv, src, dst))
-		return (free(src), free(dst), PS_ERROR);
-	normalise_size(dst, stack.size);
-	size_to_linked_list_array(prev, next, dst, &stack);
-	if (false == ps_algorithm(prev, next, &stack))
-		return (free(src), free(dst), PS_ERROR);
-	printf("\ni:   dst:  next:  prev:\n");
-	for (size_t i = 0; i < argc; i++)
-		printf("[%lu]%5zu, %5zu, %5zu,\n", i, dst[i], next[i], prev[i]);
-	return (free(src), free(dst), PS_SUCCESS);
+	next = prev + s->size;
+	ps_init(src, prev, next, s);
+	ps_algorithm(prev, next, s, (unsigned char *)src);
+	free(src);
+	free(prev);
+	return (PS_SUCCESS);
 }
 
 //gotta love bash!        `./program arg1 arg2 arg3`
 //is abs not the same as: `./program "arg1 arg2 arg3"`
-int	main(int argc, char const *argv[])
+int	main(int argc, char const **argv)
 {
-	bool	one_arg;
-	int		tmp;
+	t_ps_stack		stack;
+	int				i;
+	unsigned int	*uints;
 
 	if (argc < 2)
-		return (ft_printf("Error: provide arguments!\n"), PS_ERROR);
+		return (ft_printf("Error.\n"), PS_ERROR);
 	argv++;
 	argc--;
-	one_arg = false;
-	if (argc == 1)
+	stack.size = 0;
+	i = -1;
+	while (++i < argc)
+		stack.size += ft_countwords(argv[i], " \n\v\t\r");
+	uints = (unsigned int *)malloc(stack.size * sizeof(unsigned int));
+	if (!uints)
+		return (PS_ERROR);
+	stack.a = 0;
+	i = -1;
+	while (++i < argc)
 	{
-		argv[0] = ft_strdup(argv[0]);
-		if (argv[0] == NULL)
-			return (PS_ERROR);
-		one_arg = true;
-		argv = (char const **)ft_split(argv[0], ' ');
-		if (argv == NULL)
-			return (ft_printf("Error: malloc failure\n"), PS_ERROR);
-		argc = 0;
-		while (argv[argc] != NULL)
-			argc++;
+		stack.a = str_to_uints(argv[i], uints, stack.a);
+		if (stack.a == 0)
+			return (free(uints), PS_ERROR);
 	}
-	tmp = main2(((size_t)((argc >= 0) * 2 - 1) * argc), argv);
-	if (one_arg == true)
-		return (ft_free((void *)argv), free((char *)argv), tmp);
-	return (tmp);
+	return (main2(uints, &stack));
 }
+
+// /* OLD argv code: working 100%: */
+// static bool	argv_to_uint(size_t argc, char const *argv[], unsigned int *uint)
+// {
+// 	int	x;
+// 	int	y;
+// 	int	tmp;
+
+// 	y = -1;
+// 	while (++y < argc && argv[y])
+// 	{
+// 		while (ft_strchr(" \n\v\t\r", *argv[y]))
+// 			++(argv[y]);
+// 		x = (argv[y][0] == '-' && (argv[y][1] >= '0' && argv[y][1] <= '9'));
+// 		if (argv[y][x] < '0' || argv[y][x] > '9')
+// 			return (ft_printf("Error: argv[%u] has no digit\n", y), false);
+// 		x = ft_atoi(argv[y]);
+// 		uint[y] = x + (x < 0) * INT_MIN
+// 				+ (x >= 0) * ((unsigned int)INT_MAX + 1);
+// 		x = 0;
+// 		while (x < y)
+// 		{
+// 			if (uint[x] == uint[y])
+// 				return (ft_printf("Error: dup argv[%i-%i]\n", y, x), false);
+// 			x++;
+// 		}
+// 	}
+// 	return (true);
+// }
+

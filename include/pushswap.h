@@ -14,7 +14,7 @@
 # define PUSHSWAP_H
 
 # ifndef PS_MAX_RANGE_SIZE
-#  define PS_MAX_RANGE_SIZE 50
+#  define PS_MAX_RANGE_SIZE 8
 # endif
 
 # ifndef PS_ERROR
@@ -28,44 +28,39 @@
 #include <unistd.h>
 #include <stdbool.h>
 
-//variable names for double circular linked list 'nodes'.
-enum e_ps_pushswap
+//function ptr struct;
+enum e_ps_functions
 {
-	PS_A,
-	PS_B,
-	PS_C,
-	PS_D,
-	PS_COUNT,
+	PS_END,
+	PS_PA,
+	PS_PB,
+	PS_SA,
+	PS_SB,
+	PS_SS,
+	PS_RA,
+	PS_RB,
+	PS_RR,
+	PS_RRA,
+	PS_RRB,
+	PS_RRR,
+	PS_FUNCTIONS,
 };
 
 typedef struct s_ps_stack
 {
-	size_t	a;
-	size_t	b;
-	size_t	size;
-	size_t	total_move_count;
+	size_t			size;
+	size_t			a;
+	size_t			b;
+	size_t			total_move_count;
+	bool			print;
+	int				fd;
+	unsigned char	*funcs;
+	size_t			funclen;
 }	t_ps_stack;
 
-//DOUBLE CIRCULAR LINKED LIST, VIEWED AS ARRAYS.
-//	- next[size], values pointing to the next in the list;
-//	- prev[size], values pointing to the previous in the list; 
-//example:
-//	size = 5;
-//	a	 = 2;
-//	list = [4, 1, 3, 0, 2];
-//	next = [1, 2, 3, 4, 0];
-//	prev = [4, 0, 1, 2, 3];
-//lets introduce b [2..4]:
-//	a	 = 2;
-//	b	 = 3;
-//	list = [4, 1, 3, 0, 2];
-//	next = [1, 0, 3, 4, 2];
-//	prev = [1, 0, 4, 2, 3];
-//
-//this trick is done to let the data be small and we dont have much code.
-
-void	printstacks(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_algorithm(size_t *prev, size_t *next, t_ps_stack *stack);
+void	ps_printstack(size_t *next, t_ps_stack *stack, size_t ptr);
+bool	ps_algorithm(size_t *prev, size_t *next,\
+					 t_ps_stack *stack, unsigned char *func_seq);
 bool	ps_pa(size_t *prev, size_t *next, t_ps_stack *stack);
 bool	ps_pb(size_t *prev, size_t *next, t_ps_stack *stack);
 bool	ps_sa(size_t *prev, size_t *next, t_ps_stack *stack);
@@ -79,3 +74,45 @@ bool	ps_rrb(size_t *prev, size_t *next, t_ps_stack *stack);
 bool	ps_rrr(size_t *prev, size_t *next, t_ps_stack *stack);
 
 #endif //PUSHSWAP_H
+
+//DOUBLE CIRCULAR LINKED LIST, VIEWED AS ARRAYS.
+//	- next[size], values pointing to the next in the list;
+//	- prev[size], values pointing to the previous in the list;
+//	- index, values of current integer;
+//
+//example:
+//	size = 5;
+//	a	 = 2;
+//	list = [4, 1, 3, 0, 2];
+//	next = [1, 2, 3, 4, 0];
+//	prev = [4, 0, 1, 2, 3];
+//lets say b [2..4]:
+//	a	 = 2;
+//	b	 = 3;
+//	list = [4, 1, 3, 0, 2];
+//	next = [1, 0, 3, 4, 2];
+//	prev = [1, 0, 4, 2, 3];
+//
+//this trick is done to let the data be small so we dont have much code.
+//since this is algorithmic project and not a .
+//
+//RULES:
+// pa (push a):
+//		Take the first element at the top of b and put it at the top of a.
+//		Do nothing if b is empty.
+// pb (push b):
+//		Take the first element at the top of a and put it at the top of b.
+//		Do nothing if a is empty.
+// ra (rotate a):
+//		Shift up all elements of stack a by 1.
+//		The first element becomes the last one.
+// rb (rotate b):
+//		Shift up all elements of stack b by 1.
+//		The first element becomes the last one.
+// rr:	Rotate a and b.
+// rra (reverse rotate a):
+//		Shift down all elements of stack a by 1.
+//		The last element becomes the first one.
+// rrb (reverse rotate b):
+//		Shift down all elements of stack b by 1.
+//		The last element becomes the first one

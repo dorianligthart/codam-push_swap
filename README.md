@@ -16,4 +16,6 @@ typedef struct s_ps_stack
 }	t_ps_stack;
 ```
 
-More efficient than linked list, but hard to follow sometimes, I strongly recommend double linked circular list, as it's easier to write/grasp.
+More efficient than linked list, but hard to follow sometimes, I strongly recommend double linked circular list, as it's easier to write/grasp.\
+
+
