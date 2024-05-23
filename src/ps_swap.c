@@ -41,8 +41,8 @@ bool	ps_sa(size_t *prev, size_t *next, t_ps_stack *stack)
 		stack->a = prev[stack->a];
 		if (stack->print == true)
 		{
-			stack->total_move_count++;
-			if (write(1, "sa\n", 3) == -PS_ERROR)
+			stack->move_count++;
+			if (write(stack->fd, "sa\n", 3) == -PS_ERROR)
 				return (false);
 		}
 	}
@@ -66,8 +66,8 @@ bool	ps_sb(size_t *prev, size_t *next, t_ps_stack *stack)
 		stack->b = prev[stack->b];
 		if (stack->print == true)
 		{
-			stack->total_move_count++;
-			if (write(1, "sb\n", 3) == -PS_ERROR)
+			stack->move_count++;
+			if (write(stack->fd, "sb\n", 3) == -PS_ERROR)
 				return (false);
 		}
 	}
@@ -107,8 +107,8 @@ bool	ps_ss(size_t *prev, size_t *next, t_ps_stack *stack)
 		ps_ss2(prev, next, stack, tmp);
 		if (stack->print == true)
 		{
-			stack->total_move_count++;
-			if (write(1, "ss\n", 3) == -PS_ERROR)
+			stack->move_count++;
+			if (write(stack->fd, "ss\n", 3) == -PS_ERROR)
 				return (false);
 		}
 	}

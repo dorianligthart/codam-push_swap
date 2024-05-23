@@ -13,18 +13,14 @@
 #include <stdint.h>
 #include "pushswap.h"
 
-static inline void	ps_insert_item_to_stack(size_t *prev, size_t *next, \
-											size_t item, size_t *tmp)
+static inline void ps_norminette_push(size_t *prev, size_t *next,
+									  size_t stackx, size_t tmp2)
 {
-	if (item == SIZE_MAX)
-		item = tmp[2];
-	else
-	{
-		next[tmp[2]] = next[item];
-		prev[tmp[2]] = prev[item];
-		next[prev[item]] = tmp[2];
-		prev[next[item]] = tmp[2];
-	}
+	prev[tmp2] = prev[stackx];
+	next[tmp2] = stackx;
+	next[prev[stackx]] = tmp2;
+	prev[next[stackx]] = tmp2;
+	stackx = tmp2;
 }
 
 bool	ps_pa(size_t *prev, size_t *next, t_ps_stack *stack)
@@ -41,10 +37,13 @@ bool	ps_pa(size_t *prev, size_t *next, t_ps_stack *stack)
 			stack->a = SIZE_MAX;
 		next[tmp[0]] = tmp[1];
 		prev[tmp[1]] = tmp[0];
-		ps_insert_item_to_stack(prev, next, stack->b, tmp);
+		if (stack->b == SIZE_MAX)
+			stack->b = tmp[2];
+		else
+			ps_norminette_push(prev, next, stack->b, tmp[2]);
 		if (stack->print == true)
 		{
-			stack->total_move_count++;
+			stack->move_count++;
 			if (write(stack->fd, "pa\n", 3) == -PS_ERROR)
 				return (false);
 		}
@@ -54,8 +53,28 @@ bool	ps_pa(size_t *prev, size_t *next, t_ps_stack *stack)
 
 bool	ps_pb(size_t *prev, size_t *next, t_ps_stack *stack)
 {
-	(void)prev;
-	(void)next;
-	(void)stack;
+	size_t	tmp[3];
+
+	if (stack->b != SIZE_MAX)
+	{
+		tmp[0] = prev[stack->b];
+		tmp[1] = next[stack->b];
+		tmp[2] = stack->b;
+		stack->b = next[stack->b];
+		if (stack->b == tmp[2])
+			stack->b = SIZE_MAX;
+		next[tmp[0]] = tmp[1];
+		prev[tmp[1]] = tmp[0];
+		if (stack->a == SIZE_MAX)
+			stack->a = tmp[2];
+		else
+			ps_norminette_push(prev, next, stack->a, tmp[2]);
+		if (stack->print == true)
+		{
+			stack->move_count++;
+			if (write(stack->fd, "pa\n", 3) == -PS_ERROR)
+				return (false);
+		}
+	}
 	return (true);
 }

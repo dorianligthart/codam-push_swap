@@ -32,7 +32,7 @@ static void	ps_init(size_t *src, size_t *prev, size_t *next, t_ps_stack *s)
 	}
 	s->print = false;
 	s->fd = 1;
-	s->total_move_count = 0;
+	s->move_count = 0;
 	s->a = src[0];
 	s->b = SIZE_MAX;
 }
@@ -119,7 +119,9 @@ static int	main2(unsigned int *uints, t_ps_stack *s)
 		return (free(src), PS_ERROR);
 	next = prev + s->size;
 	ps_init(src, prev, next, s);
-	ps_algorithm(prev, next, s, (unsigned char *)src);
+	s->funcseq = (unsigned char *)src;
+	for (size_t z = 0; z < s->size; z++) printf("%zu, ", src[z]);
+	ps_algorithm(prev, next, s);
 	free(src);
 	free(prev);
 	return (PS_SUCCESS);
@@ -154,33 +156,3 @@ int	main(int argc, char const **argv)
 	}
 	return (main2(uints, &stack));
 }
-
-// /* OLD argv code: working 100%: */
-// static bool	argv_to_uint(size_t argc, char const *argv[], unsigned int *uint)
-// {
-// 	int	x;
-// 	int	y;
-// 	int	tmp;
-
-// 	y = -1;
-// 	while (++y < argc && argv[y])
-// 	{
-// 		while (ft_strchr(" \n\v\t\r", *argv[y]))
-// 			++(argv[y]);
-// 		x = (argv[y][0] == '-' && (argv[y][1] >= '0' && argv[y][1] <= '9'));
-// 		if (argv[y][x] < '0' || argv[y][x] > '9')
-// 			return (ft_printf("Error: argv[%u] has no digit\n", y), false);
-// 		x = ft_atoi(argv[y]);
-// 		uint[y] = x + (x < 0) * INT_MIN
-// 				+ (x >= 0) * ((unsigned int)INT_MAX + 1);
-// 		x = 0;
-// 		while (x < y)
-// 		{
-// 			if (uint[x] == uint[y])
-// 				return (ft_printf("Error: dup argv[%i-%i]\n", y, x), false);
-// 			x++;
-// 		}
-// 	}
-// 	return (true);
-// }
-

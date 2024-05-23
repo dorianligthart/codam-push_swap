@@ -14,15 +14,15 @@
 # define LIBFT_H
 # include <stddef.h>  // 'size_t';
 # include <stdbool.h> // 'bool';
+// #  include <stdio.h>
+// #  include <unistd.h>
+// #  include <limits.h>
+// #  include <string.h>
 
+/*
 # if defined(RESET) && defined(RED) && defined(GREEN) && defined(YELLOW)\
-	&& defined(BLUE) && defined(MAGENTA) && defined(CYAN) && defined(WHITE)
+&& defined(BLUE) && defined(MAGENTA) && defined(CYAN) && defined(WHITE)
 # else
-#  include <stdio.h>
-#  include <unistd.h>
-#  include <limits.h>
-#  include <string.h>
-
 #  define RESET "\033[0m"
 #  define BLACK "\033[0;30m"
 #  define RED "\033[0;31m"
@@ -33,6 +33,7 @@
 #  define CYAN "\033[0;36m"
 #  define WHITE "\033[0;37m"
 # endif //defined(...)
+//*/
 
 # ifndef VA_FORBIDDEN
 // #  include "printf.h"

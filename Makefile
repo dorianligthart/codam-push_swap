@@ -1,22 +1,26 @@
 NAME	 := push_swap
 NAME_BON := checker_linux
 CFLAGS	 := -Wextra -Wall -Werror -Wunreachable-code -g
-CC       := gcc
-HEADERS	:= -I ./include
+CC       := cc
+INCLUDE	 := -I ./include
+HEADERS  := $(shell find include -iname "*.h")
 
+#TODO: add libft :_)
 SRC		:= $(shell find src -iname "*.c") #TODO: PROJECT_END: type out src
 OBJ		:= $(addsuffix .o, $(basename $(SRC)))
-SRC_BON	:= $(shell find src_bonus -iname "*.c") #TODO: PROJECT_END: type out src_bonus
+SRC_BON	:= $(shell find src_bonus -iname "*.c") src/libft.c #TODO: PROJECT_END: type out src_bonus
 OBJ_BON	:= $(addsuffix .o, $(basename $(SRC_BON)))
 
 %.o: %.c
-	@$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS)
+	@$(CC) $(CFLAGS) -o $@ -c $< $(INCLUDE)
 
-$(NAME): $(OBJ)
-	$(CC) $(OBJ) $(HEADERS) -o $(NAME)
+$(NAME): $(HEADERS) $(OBJ)
+#	@echo -n "Are you sure you want to: $(CC) $(OBJ) $(INCLUDE) -o $(NAME) [y/N] " && read ans && [ $${ans:-N} = y ]
+	$(CC) $(OBJ) $(INCLUDE) -o $(NAME)
 
-$(NAME_BON): $(OBJ_BON)
-	$(CC) $(OBJ_BON) $(HEADERS) -o $(NAME_BON)
+$(NAME_BON): $(HEADERS) $(OBJ_BON)
+#	@echo -n "Are you sure you want to: $(CC) $(OBJ_BON) $(INCLUDE) -o $(NAME_BON) [y/N] " && read ans && [ $${ans:-N} = y ]
+	$(CC) $(OBJ_BON) $(INCLUDE) -o $(NAME_BON)
 
 all: $(NAME)
 bonus: $(NAME_BON)
@@ -25,8 +29,5 @@ clean:
 fclean: clean
 	@rm -f $(NAME) $(NAME_BON)
 re: fclean all
-
-# fsanitize: CFLAGS += -g -fsanitize=address 
-# fsanitize: re
 
 .PHONY: all clean fclean re 

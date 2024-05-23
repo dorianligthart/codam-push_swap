@@ -27,92 +27,103 @@
 
 #include <unistd.h>
 #include <stdbool.h>
+#include <stdint.h> //SIZE_MAX
 
 //function ptr struct;
-enum e_ps_functions
+enum e_functions
 {
-	PS_END,
-	PS_PA,
-	PS_PB,
-	PS_SA,
-	PS_SB,
-	PS_SS,
-	PS_RA,
-	PS_RB,
-	PS_RR,
-	PS_RRA,
-	PS_RRB,
-	PS_RRR,
-	PS_FUNCTIONS,
+	END,
+	PA,
+	PB,
+	SA,
+	SB,
+	SS,
+	RA,
+	RB,
+	RR,
+	RRA,
+	RRB,
+	RRR,
+	FUNCTIONS,
 };
 
-typedef struct s_ps_stack
+typedef struct s_ranges
+{
+	t_range	*range;
+	size_t		size;
+}	t_ranges;
+
+
+typedef struct s_range
+{
+	size_t	min;
+	size_t	max;
+	size_t	size;
+	size_t	move_count;
+}	t_range;
+
+typedef struct s_stack
 {
 	size_t			size;
 	size_t			a;
 	size_t			b;
-	size_t			total_move_count;
+	size_t			move_count;
 	bool			print;
 	int				fd;
-	unsigned char	*funcs;
+	unsigned char	*funcseq;
 	size_t			funclen;
-}	t_ps_stack;
+}	t_stack;
 
-void	ps_printstack(size_t *next, t_ps_stack *stack, size_t ptr);
-bool	ps_algorithm(size_t *prev, size_t *next,\
-					 t_ps_stack *stack, unsigned char *func_seq);
-bool	ps_pa(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_pb(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_sa(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_sb(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_ss(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_ra(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_rb(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_rr(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_rra(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_rrb(size_t *prev, size_t *next, t_ps_stack *stack);
-bool	ps_rrr(size_t *prev, size_t *next, t_ps_stack *stack);
+void	printstack(size_t *next, t_stack *stack, size_t ptr);
+bool	algorithm(size_t *prev, size_t *next, t_stack *stack);
 
-#endif //PUSHSWAP_H
-
-//DOUBLE CIRCULAR LINKED LIST, VIEWED AS ARRAYS.
-//	- next[size], values pointing to the next in the list;
-//	- prev[size], values pointing to the previous in the list;
-//	- index, values of current integer;
-//
-//example:
-//	size = 5;
-//	a	 = 2;
-//	list = [4, 1, 3, 0, 2];
-//	next = [1, 2, 3, 4, 0];
-//	prev = [4, 0, 1, 2, 3];
-//lets say b [2..4]:
-//	a	 = 2;
-//	b	 = 3;
-//	list = [4, 1, 3, 0, 2];
-//	next = [1, 0, 3, 4, 2];
-//	prev = [1, 0, 4, 2, 3];
-//
-//this trick is done to let the data be small so we dont have much code.
-//since this is algorithmic project and not a .
-//
-//RULES:
 // pa (push a):
 //		Take the first element at the top of b and put it at the top of a.
 //		Do nothing if b is empty.
+bool	pa(size_t *prev, size_t *next, t_stack *stack);
+
 // pb (push b):
 //		Take the first element at the top of a and put it at the top of b.
 //		Do nothing if a is empty.
+bool	pb(size_t *prev, size_t *next, t_stack *stack);
+
+// sa (swap a):
+//		Swap the first 2 elements at the top of stack a.
+// 		Do nothing if there is only one or no elements.
+bool	sa(size_t *prev, size_t *next, t_stack *stack);
+
+// sb (swap b):
+//		Swap the first 2 elements at the top of stack b.
+// 		Do nothing if there is only one or no elements.
+bool	sb(size_t *prev, size_t *next, t_stack *stack);
+
+// ss : swap a and b at the same time. see sa() and sb();
+bool	ss(size_t *prev, size_t *next, t_stack *stack);
+
 // ra (rotate a):
 //		Shift up all elements of stack a by 1.
 //		The first element becomes the last one.
+bool	ra(size_t *prev, size_t *next, t_stack *stack);
+
 // rb (rotate b):
 //		Shift up all elements of stack b by 1.
 //		The first element becomes the last one.
+bool	rb(size_t *prev, size_t *next, t_stack *stack);
+
 // rr:	Rotate a and b.
+bool	rr(size_t *prev, size_t *next, t_stack *stack);
+
 // rra (reverse rotate a):
 //		Shift down all elements of stack a by 1.
 //		The last element becomes the first one.
+bool	rra(size_t *prev, size_t *next, t_stack *stack);
+
 // rrb (reverse rotate b):
 //		Shift down all elements of stack b by 1.
-//		The last element becomes the first one
+//		The last element becomes the first one.
+bool	rrb(size_t *prev, size_t *next, t_stack *stack);
+
+// rrr:	Reverse Rotate a and b.
+bool	rrr(size_t *prev, size_t *next, t_stack *stack);
+#endif //PUSHSWAP_H
+
