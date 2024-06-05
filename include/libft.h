@@ -6,7 +6,7 @@
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 19:09:51 by doligtha          #+#    #+#             */
-/*   Updated: 2024/04/11 21:54:07 by doligtha         ###   ########.fr       */
+/*   Updated: 2024/05/10 09:35:51 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,15 @@
 # define LIBFT_H
 # include <stddef.h>  // 'size_t';
 # include <stdbool.h> // 'bool';
+// #  include <stdio.h>
+// #  include <unistd.h>
+// #  include <limits.h>
+// #  include <string.h>
 
+/*
 # if defined(RESET) && defined(RED) && defined(GREEN) && defined(YELLOW)\
-	&& defined(BLUE) && defined(MAGENTA) && defined(CYAN) && defined(WHITE)
+&& defined(BLUE) && defined(MAGENTA) && defined(CYAN) && defined(WHITE)
 # else
-#  include <stdio.h>
-#  include <unistd.h>
-#  include <limits.h>
-#  include <string.h>
-
 #  define RESET "\033[0m"
 #  define BLACK "\033[0;30m"
 #  define RED "\033[0;31m"
@@ -33,9 +33,10 @@
 #  define CYAN "\033[0;36m"
 #  define WHITE "\033[0;37m"
 # endif //defined(...)
+//*/
 
 # ifndef VA_FORBIDDEN
-#  include "printf.h"
+// #  include "printf.h"
 
 int		ft_printf(const char *format, ...);
 # endif
@@ -127,6 +128,7 @@ char	*ft_strstr(const char *big, const char *little);
 char	*ft_strrstr(const char *big, const char *little);
 void	ft_free(void **ptr);
 void	ft_mapchr(char **map, char c, size_t *x, size_t *y);
+size_t	ft_countwords(const char *str, const char *delims);
 
 //gnl:
 # ifndef BUFFER_SIZE
