@@ -1,40 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pushswap2.c                                        :+:      :+:    :+:   */
+/*   ft_hchar.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: doligtha <doligtha@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/03 18:18:51 by doligtha          #+#    #+#             */
-/*   Updated: 2024/06/03 18:18:51 by doligtha         ###   ########.fr       */
+/*   Created: 2024/06/13 05:38:44 by doligtha          #+#    #+#             */
+/*   Updated: 2024/06/13 05:38:44 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pushswap.h"
-#include <stdint.h>
-
-void	ra(t_stack *s)
+unsigned char	ft_hchar_combine(unsigned char left, unsigned char right)
 {
-	rotate(&s->a, s->next);
+    return ((left << 4) | right);
 }
 
-void	rb(t_stack *s)
+unsigned char	ft_hchar_getleft(unsigned char lefrig)
 {
-	rotate(&s->b, s->next);
+    return (lefrig >> 4);
 }
 
-void	rr(t_stack *s)
+unsigned char	ft_hchar_getright(unsigned char lefrig)
 {
-	rotate(&s->a, s->next);
-	rotate(&s->b, s->next);
+    return (lefrig & 0x0F);
 }
 
-void	rra(t_stack *s)
-{
-	rotate(&s->a, s->prev);
-}
-
-void	rrb(t_stack *s)
-{
-	rotate(&s->b, s->prev);
-}

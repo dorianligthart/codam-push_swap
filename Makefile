@@ -1,33 +1,27 @@
-NAME	 := push_swap
-NAME_BON := checker_linux
-# CFLAGS	 := -Wextra -Wall -Werror -Wunreachable-code -g
-CC       := clang
-INCLUDE	 := -I ./include
-HEADERS  := $(shell find include -iname "*.h")
+NAME     = push_swap
+NAME_BON = checker_linux
+CC       = cc
+CFLAGS   = -I ./include -Wall -Wextra -Werror -g -fsanitize=address
 
-#TODO: add libft :_)
-SRC		:= $(shell find src -iname "*.c") #TODO: PROJECT_END: type out src
-OBJ		:= $(addsuffix .o, $(basename $(SRC)))
-SRC_BON	:= $(shell find src_bonus -iname "*.c") src/libft.c #TODO: PROJECT_END: type out src_bonus
-OBJ_BON	:= $(addsuffix .o, $(basename $(SRC_BON)))
+SRC = $(shell find src -iname "*.c") #TODO: PROJECT_END: type out src
+SRC_BON = $(shell find src_bonus -iname "*.c") #TODO: PROJECT_END: type out src
 
-%.o: %.c
-	@$(CC) $(CFLAGS) -o $@ -c $< $(INCLUDE)
+$(NAME): $(BUILD) $(HEADERS) $(SRC)
+#	@echo -n "Are you sure you want to: $(CC) $(CFLAGS) $(SRC) -o $(NAME)\
+    [y/N] " && read ans && [ $${ans:-N} = y ]
+	$(CC) $(CFLAGS) $(SRC) -o $(NAME)
 
-$(NAME): $(HEADERS) $(OBJ)
-#	@echo -n "Are you sure you want to: $(CC) $(OBJ) $(INCLUDE) -o $(NAME) [y/N] " && read ans && [ $${ans:-N} = y ]
-	$(CC) $(OBJ) $(INCLUDE) -o $(NAME)
-
-$(NAME_BON): $(HEADERS) $(OBJ_BON)
-#	@echo -n "Are you sure you want to: $(CC) $(OBJ_BON) $(INCLUDE) -o $(NAME_BON) [y/N] " && read ans && [ $${ans:-N} = y ]
-	$(CC) $(OBJ_BON) $(INCLUDE) -o $(NAME_BON)
+$(NAME_BON): $(BUILD) $(HEADERS) $(SRC_BON)
+#	@echo -n "Are you sure you want to: $(CC) $(CFLAGS) $(SRC_BON) -o $(NAME_BON)\
+    [y/N] " && read ans && [ $${ans:-N} = y ]
+	$(CC) $(CFLAGS) $(SRC_BON) src/libft.c -o $(NAME_BON)
 
 all: $(NAME)
 bonus: $(NAME_BON)
 clean:
-	@rm -f $(OBJ) $(OBJ_BON)
+	rm -f $(NAME)
+	rm -f $(NAME_BON)
 fclean: clean
-	@rm -f $(NAME) $(NAME_BON)
-re: fclean all
+re: fclean $(NAME)
 
-.PHONY: all clean fclean re 
+.PHONY: $(NAME) all bonus clean fclean re
