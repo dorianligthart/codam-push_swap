@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ps_algorithm.c                                     :+:      :+:    :+:   */
+/*   algorithm.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: doligtha <doligtha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/09 17:47:45 by doligtha          #+#    #+#             */
-/*   Updated: 2024/05/16 18:15:09 by doligtha         ###   ########.fr       */
+/*   Created: 2024/06/14 19:50:53 by doligtha          #+#    #+#             */
+/*   Updated: 2024/06/15 08:23:11 by doligtha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,63 +15,60 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-//inverse for stack B check.
-bool	ps_israngesorted(t_stack *s, size_t ptr, t_range *range, bool inverse)
+//throughout the program higher range is always targeted to be highest.
+void	ps_split_range_2a(t_stack *s, t_range *initial, t_range *higher)
 {
-	size_t	stay;
-	size_t	n;
+	size_t	len;
 
-	if (ptr == SIZE_MAX)
-		return (false);
-	n = range->max - range->min + 1;
-	stay = ptr;
-	while (s->next[ptr] != stay && n--)
+	len = initial->max - initial->min + 1;
+
+	higher->min = initial->min + len / 2 + len % 2 - 1;
+	higher->max = initial->max;
+	
+	initial->max = initial->min + len / 2 + len % 2;
+	initial->min = initial->min;
+
+	while (len--)
 	{
-		if (s->next[ptr] != ptr + (inverse == true) * -2 + 1)
-			return (false);
-		ptr = s->next[ptr];
+		if (s->a <= initial->max)
+			ps_run(s, F_PB);
+		if (s->a >= higher->min)
+			ps_run(s, F_RA);
 	}
-	return (true);
+	s->ri += 1;
+	// printf("initial->min=%zu, initial->max=%zu\n", initial->min, initial->max);
+	// printf("higher->min=%zu, higher->max=%zu\n", higher->min, higher->max);
 }
 
-//hard coded solver for stack A or B, size 2 and 3.
-static inline void	solve_23(t_stack *s, size_t offset,
-							 int hmuch, bool target_a)
+//only done one time, it's the first move to divide stack A digits to 3 ranges.
+void	ps_split_range_3a(t_stack *s, t_range *initial,
+						  t_range *middle, t_range *higher)
 {
-	if (hmuch <= 3 && target_a == true)
-	{
-		if (s->next[s->a] == offset + 2)
-			ra(s);
-		else if (s->a == offset + 2)
-			rra(s);
-		if (s->a == offset + 1)
-			sa(s);
-	}
-	else if (hmuch <= 3 && target_a == false)
-	{
-		if (s->next[s->b] == offset + 2)
-			rb(s);
-		else if (s->b == offset + 2)
-			rrb(s);
-		if (s->b == offset + 1)
-			sb(s);
-	}
-}
+	size_t	len;
 
-//check if 
-bool	ps_algorithm_recursion(t_stack *s, size_t ptr,
-								size_t len, bool inverse)
-{
-	(void)s;
-	(void)ptr;
-	(void)len;
-	(void)inverse;
-	return (false);
+	len = s->ranges[s->ri].max - s->ranges[s->ri].min + 1;
+	
+	higher->max = initial->max;
+	higher->min = initial->min + len / 3 * 2 + len % 3 - 1;
+
+	middle->max = initial->min + len / 3 * 2 + len % 3;
+	middle->min = initial->min + len / 3 - 1; 
+	
+	initial->max = initial->min + len / 3;
+	initial->min = initial->min; 
+	while (len--)
+	{
+		if (s->a <= initial->max)
+			ps_run(s, F_PA);
+		if (s->a >= middle->min && s->a <= middle->max)
+			ps_run_multiple(s, 2, F_PA, F_RRB);
+		if (s->a >= higher->min)
+			ps_run(s, F_RA);
+	}
+	s->ri += 2;
 }
 
 void	ps_algorithm(t_stack *s)
 {
-	if (s->size <= 6)
-		solve_23(s, 0, s->size, true);
 	(void)s;
 }

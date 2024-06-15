@@ -14,21 +14,44 @@
 #include <stdarg.h> //va_list, va_start(), va_arg(), va_end()
 #include <unistd.h> //write()
 #include <stdlib.h>
+#include <stdint.h>
 
-char	*ft_strchr(const char *s, int c)
+//NEW LIBFT FUNCTIONS :
+
+//loops through stack, finds the smallest && bigger than index and set to index.
+//messes up data if there are duplicates.
+void	ft_normalise_size(size_t *dst, size_t size)
 {
-	size_t	i;
+	size_t	x;
+	size_t	y;
+	size_t	min;
+	size_t	tmp;
 
-	i = -1;
-	while (s && s[++i])
-		if (s[i] == (unsigned char)c)
-			return ((char *)(s + i));
-	if (s && (unsigned char)c == '\0')
-		return ((char *)(s + i));
-	return (NULL);
+	tmp = 0;
+	y = 0;
+	while (y < size)
+	{
+		x = 0;
+		min = SIZE_MAX;
+		while (x < size)
+		{
+			if ((min > dst[x]
+				|| (y == size - 1 && dst[x] == SIZE_MAX))
+				&& y <= dst[x])
+			{
+				min = dst[x];
+				tmp = x;
+			}
+			x++;
+		}
+		dst[tmp] = y;
+		y++;
+	}
 }
 
+char	*ft_strchr(const char *s, int c);
 //" \n\v\t\r"
+//Like unix's: `tr 'delims' '\n' | wc -l`
 size_t	ft_countwords(const char *str, const char *delims)
 {
 	size_t		wordcount;
@@ -51,17 +74,40 @@ size_t	ft_countwords(const char *str, const char *delims)
 	return (wordcount);
 }
 
-void	ft_free(void **address)
-{
-	int	i;
+//OLDER FUNCTIONS :
 
-	i = 0;
-	while (address[i] != NULL)
-	{
-		free(address[i]);
-		i++;
-	}
-	free(address);
+void    *ft_memcpy(void *dest, const void *src, size_t n)
+{
+        if (dest && !src)
+                return (dest);
+        if (!dest || !src)
+                return (NULL);
+        while (n--)
+                *(unsigned char *)(dest + n) = *(unsigned char *)(src + n);
+        return (dest);
+}
+
+void    *ft_memset(void *s, int c, size_t n)
+{
+        size_t  i;
+
+        i = 0;
+        while (s && n--)
+                ((unsigned char *)s)[i++] = (unsigned char)c;
+        return (s);
+}
+
+char	*ft_strchr(const char *s, int c)
+{
+	size_t	i;
+
+	i = -1;
+	while (s && s[++i])
+		if (s[i] == (unsigned char)c)
+			return ((char *)(s + i));
+	if (s && (unsigned char)c == '\0')
+		return ((char *)(s + i));
+	return (NULL);
 }
 
 int	ft_atoi(const char *nptr)
@@ -78,41 +124,6 @@ int	ft_atoi(const char *nptr)
 	if (nptr[0] == '-')
 		result *= -1;
 	return (result);
-}
-
-static char	**it(const char *s, char c, int w, int i)
-{
-	char	**s2;
-	int		words;
-
-	words = 0;
-	while (s && s[i])
-		if (s[i++] != c && (s[i] == c || s[i] == '\0'))
-			words++;
-	s2 = (char **)malloc((words + 1) * sizeof(char *));
-	s2[words] = NULL;
-	while (s2 && i--)
-	{
-		if (s[i] != c && ++w && (i == 0 || s[i - 1] == c))
-		{
-			s2[--words] = (char *)malloc((w + 1) * sizeof(char));
-			if (!s2[words])
-			{
-				while (s2[++words])
-					free(s2[words]);
-				return (free(s2), NULL);
-			}
-			s2[words][w++] = '\0';
-			while (--w)
-				s2[words][w - 1] = s[i + w - 1];
-		}
-	}
-	return (s2);
-}
-
-char	**ft_split(char const *s, char c)
-{
-	return (it(s, c, 0, 0));
 }
 
 static int	puint(int fd, unsigned long nbr, char *basestr)

@@ -1,6 +1,15 @@
 #include "pushswap.h"
 #include "libft.h"
 
+
+//error in this function!!!
+// solution for inserting *x before *y:
+//
+// next[prev[y]] = *x
+// prev[*x]      = prev[*y]
+// 
+// prev[*y]      = *x
+// next[*x]      = *y
 void	push_x_to_y(size_t *x, size_t *y, t_stack *s)
 {
 	size_t	temp;
@@ -27,7 +36,7 @@ void	push_x_to_y(size_t *x, size_t *y, t_stack *s)
 
 void	swap(size_t *this, t_stack *s)
 {
-	size_t	t[2];
+	size_t	temp[2];
 	size_t	*next;
 	size_t	*prev;
 
@@ -35,26 +44,27 @@ void	swap(size_t *this, t_stack *s)
 	prev = s->prev;
 	if (next[*this] != *this)
 	{
-		(t[0] = *this, t[1] = next[*this]);
-		prev[next[next[*this]]] = t[0];
-		next[t[0]] = next[next[*this]];
-		next[prev[*this]] = t[1];
-		prev[t[1]] = prev[*this];
-		prev[t[0]] = t[1];
-		next[t[1]] = t[0];
+		temp[0] = *this;
+		temp[1] = next[*this];
+		prev[next[next[*this]]] = temp[0];
+		next[temp[0]] = next[next[*this]];
+		next[prev[*this]] = temp[1];
+		prev[temp[1]] = prev[*this];
+		prev[temp[0]] = temp[1];
+		next[temp[1]] = temp[0];
 		*this = prev[*this];
 	}
 }
 
-//provide direction, reverse = s->prev, normal = s->next.
+//provide direction, reverse rotation = s->prev, normal rotation = s->next.
 void	rotate(size_t *this, size_t *direction)
 {
-	if (*this != SIZE_MAX && direction[*this] != *this)
+	if (*this != SIZE_MAX)
 		*this = direction[*this];
 }
 
 void	rrr(t_stack *s)
 {
 	rotate(&s->a, s->prev);
-	rotate(&s->b, s->prev);
+	rotate(&s->b, s->next);
 }

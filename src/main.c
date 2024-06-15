@@ -19,39 +19,34 @@
 #include <limits.h>
 #include <stdint.h> //SIZE_MAX
 
-//O*N^2
-//loops through stack, finds the smallest && bigger than index and set to index.
-//messes up data if there are duplicates.
-static void	normalise_size(size_t *dst, size_t size)
+// i = (i < PS_WRITE_BUF_SIZE - 8 && write(s->fd, buffer, i)) * i;
+//I wish I could assert PS_WRITE_BUF_SIZE here!!
+bool	ps_write_fseq(t_stack *s)
 {
-	size_t	x;
-	size_t	y;
-	size_t	min;
-	size_t	tmp;
+	char			buffer[PS_WRITE_BUF_SIZE];
+	int				i;
+	size_t			iter;
+	unsigned char	right;
+	unsigned char	left;
 
-	tmp = 0;
-	y = 0;
-	while (y < size)
+	if (PS_WRITE_BUF_SIZE < 8)
+		return (false);
+	iter = 0;
+	i = 0;
+	while (iter < s->fseqlen)
 	{
-		x = 0;
-		min = SIZE_MAX;
-		while (x < size)
-		{
-			if ((min > dst[x]
-				|| (y == size - 1 && dst[x] == SIZE_MAX))
-				&& y <= dst[x])
-			{
-				min = dst[x];
-				tmp = x;
-			}
-			x++;
-		}
-		dst[tmp] = y;
-		y++;
+		right = ft_hchar_getright(s->fseq[iter]);
+		ft_memcpy(buffer, s->foutput[right], s->foutputlen[right]);
+		left = ft_hchar_getleft(s->fseq[iter]);
+		ft_memcpy(buffer, s->foutput[left], s->foutputlen[left]);
+		if (i < PS_WRITE_BUF_SIZE - 8 && write(s->fd, buffer, i) < 0)
+			return (false);
+		i += s->foutputlen[right] + s->foutputlen[left];
 	}
+	return (true);
 }
 
-static int	ps_initialise2(t_stack *s)
+static int	ps_initialise2(t_stack *stack)
 {
 	void		(*fptrs[F_COUNT])(t_stack *) = {[F_PA] = pa,
 					[F_RA] = ra, [F_RB] = rb, [F_RR] = rr,
@@ -68,15 +63,15 @@ static int	ps_initialise2(t_stack *s)
 					[F_PB] = 3, [F_RRA] = 4, [F_RRB] = 4,
 					[F_RRR] = 4,[FU_SA] = 3, [FU_SB] = 3, [FU_SS] = 3};
 
-	s->next = s->prev + s->size;
-	s->b = SIZE_MAX;
-	s->fseqiterator = 0;
-	s->fptrs = fptrs;
-	s->foutput = foutput;
-	s->foutputlen = foutputlen;
-	ft_memset(s->ranges, 0, sizeof(t_range) * PS_RANGE_COUNT);
-	ps_algorithm(s);
-	free(s->prev);
+	stack->next = stack->prev + stack->size;
+	stack->b = SIZE_MAX;
+	stack->fseqlen = 0;
+	stack->fptrs = fptrs;
+	stack->foutput = foutput;
+	stack->foutputlen = foutputlen;
+	ps_algorithm_entry(stack);
+	free(stack->prev);
+	free(stack->fseq);
 	return (EXIT_SUCCESS);
 }
 
@@ -85,6 +80,7 @@ static int	ps_initialise(unsigned int *uints, t_stack *stack)
 	size_t	*array;
 	size_t	i;
 
+	stack->fd = 1;
 	array = (size_t *)malloc(stack->size * sizeof(size_t));
 	if (array == NULL)
 		return (free(uints), EXIT_ERROR);
@@ -92,16 +88,17 @@ static int	ps_initialise(unsigned int *uints, t_stack *stack)
 	while (++i < stack->size)
 		array[i] = (size_t)uints[i];
 	free(uints);
-	normalise_size(array, stack->size);
+	ft_normalise_size(array, stack->size);
+	stack->prev = (size_t *)malloc((2 * stack->size) * sizeof(size_t));
+	if (stack->prev == NULL)
+		return (free(array), EXIT_ERROR);
+	stack->next = stack->prev + stack->size;
 	i = -1;
 	while (++i < stack->size)
 	{
 		stack->prev[array[i]] = array[i + (i == 0) * stack->size - 1];
 		stack->next[array[i]] = array[(i + 1) % stack->size];
 	}
-	stack->prev = (size_t *)malloc((2 * stack->size) * sizeof(size_t));
-	if (stack->prev == NULL)
-		return (free(array), EXIT_ERROR);
 	stack->a = array[0];
 	stack->fseq = (unsigned char *)array;
 	return (ps_initialise2(stack));
@@ -134,6 +131,14 @@ static size_t	str_to_uints(const char *str, unsigned int *uint, size_t y)
 	return (y);
 }
 
+// program limit:
+// your_ram - (SIZE_MAX/3 - this_struct - 11_output_strs_lens_fpointers).
+// ngl it's useless but fun to stretch limits even though in theory no one has
+// approximately 18446744073709551615/3 bytes of ram.
+// For comparison a normal motherboard can 'only' carry:
+// 128gb ram   = 128000000000 bytes.
+////////////////////////////////////////////////////////////////////
+//Notes:
 //gotta love bash!        `./program arg1 arg2 arg3`
 //is abs not the same as: `./program "arg1 arg2 arg3"`
 int	main(int argc, char const **argv)
@@ -144,9 +149,9 @@ int	main(int argc, char const **argv)
 
 	if (argc < 2)
 		return (ft_printf("Error.\n"), EXIT_ERROR);
+	ft_memset(stack.ranges, 0, sizeof(t_range) * PS_RANGE_COUNT);
 	argv++;
 	argc--;
-	stack.fd = 1;
 	stack.size = 0;
 	i = -1;
 	while (++i < argc)

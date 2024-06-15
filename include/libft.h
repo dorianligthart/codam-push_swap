@@ -123,7 +123,7 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 // 	}
 // 	return (dest);
 // }
-size_t	ft_len(void **ptr, size_t ptrsize);
+void	ft_normalise_size(size_t *dst, size_t size);
 char	*ft_strstr(const char *big, const char *little);
 char	*ft_strrstr(const char *big, const char *little);
 void	ft_free(void **ptr);
