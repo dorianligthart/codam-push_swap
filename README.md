@@ -4,12 +4,12 @@ TODO: Check and implement something like this [algorithm youtube video](https://
 
 ```C
 //DOUBLE CIRCULAR LINKED LIST, VIEWED AS ARRAYS.
-//	- next[argc], values pointing to the next in the list;
-//	- prev[argc], values pointing to the previous in the list;
 //
 //	indexes are values, values are indexes to next/previous 'nodes';
 typedef struct s_ps_stack
 {
+	next[argc] // values pointing to the next in the list;
+	prev[argc] // values pointing to the previous in the list;
 	size_t	a;
 	size_t	b;
 	size_t	size;

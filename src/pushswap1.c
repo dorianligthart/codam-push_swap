@@ -15,12 +15,12 @@
 
 void	pa(t_stack *s)
 {
-	push_x_to_y(&s->a, &s->b, s);
+	push_x_to_y(&s->b, &s->a, s);
 }
 
 void	pb(t_stack *s)
 {
-    push_x_to_y(&s->b, &s->a, s);
+    push_x_to_y(&s->a, &s->b, s);
 }
 
 void	sa(t_stack *s)

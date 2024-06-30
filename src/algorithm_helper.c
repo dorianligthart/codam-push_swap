@@ -16,44 +16,18 @@
 #include <stdbool.h>
 
 //throughout the program higher range is always targeted to be highest.
-void	ps_split_range_2a(t_stack *s, t_range *initial, t_range *higher)
-{
-	size_t	len;
-
-	len = initial->max - initial->min + 1;
-
-	higher->min = initial->min + len / 2 + len % 2 - 1;
-	higher->max = initial->max;
-	
-	initial->max = initial->min + len / 2 + len % 2;
-	initial->min = initial->min;
-
-	while (len--)
-	{
-		if (s->a <= initial->max)
-			ps_run(s, F_PB);
-		if (s->a >= higher->min)
-			ps_run(s, F_RA);
-	}
-	s->ri += 1;
-	// printf("initial->min=%zu, initial->max=%zu\n", initial->min, initial->max);
-	// printf("higher->min=%zu, higher->max=%zu\n", higher->min, higher->max);
-}
 
 //only done one time, it's the first move to divide stack A digits to 3 ranges.
-void	ps_split_range_3a(t_stack *s, t_range *initial,
+void	ps_split_range_a_into_3(t_stack *s, t_range *initial,
 						  t_range *middle, t_range *higher)
 {
 	size_t	len;
 
 	len = s->ranges[s->ri].max - s->ranges[s->ri].min + 1;
-	
 	higher->max = initial->max;
 	higher->min = initial->min + len / 3 * 2 + len % 3 - 1;
-
 	middle->max = initial->min + len / 3 * 2 + len % 3;
 	middle->min = initial->min + len / 3 - 1; 
-	
 	initial->max = initial->min + len / 3;
 	initial->min = initial->min; 
 	while (len--)
@@ -68,7 +42,42 @@ void	ps_split_range_3a(t_stack *s, t_range *initial,
 	s->ri += 2;
 }
 
-void	ps_algorithm(t_stack *s)
+	// printf("initial->min=%zu, initial->max=%zu\n", initial->min, initial->max);
+	// printf("higher->min=%zu, higher->max=%zu\n", higher->min, higher->max);
+void	ps_split_range_a(t_stack *s, t_range *initial, t_range *higher)
 {
-	(void)s;
+	size_t	len;
+
+	len = initial->max - initial->min + 1;
+	higher->min = initial->min + len / 2 + len % 2;
+	higher->max = initial->max;
+	initial->max = initial->min + len / 2 + len % 2 - 1;
+	initial->min = initial->min;
+	while (len--)
+	{
+		if (s->a <= initial->max)
+			ps_run(s, F_PB);
+		if (s->a >= higher->min)
+			ps_run(s, F_RA);
+	}
+	s->ri += 1;
+}
+
+void	ps_split_range_b(t_stack *s, t_range *initial, t_range *higher)
+{
+	size_t	len;
+
+	len = initial->max - initial->min + 1;
+	higher->min = initial->min + len / 2 + len % 2 - 1;
+	higher->max = initial->max;	
+	initial->max = initial->min + len / 2 + len % 2;
+	initial->min = initial->min;
+	while (len--)
+	{
+		if (s->b <= initial->max)
+			ps_run(s, F_RA);
+		if (s->b >= higher->min)
+			ps_run(s, F_PB);
+	}
+	s->ri += 1;
 }

@@ -28,7 +28,6 @@ void	ps_run(t_stack *s, unsigned char function)
 		s->fseqlen++;
 	}
 	s->fptrs[function](s);
-	write(1, s->foutput[function], s->foutputlen[function]);
 }
 
 void	ps_run_multiple(t_stack *s, int count, ...)

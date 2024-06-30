@@ -1,6 +1,22 @@
 #include "pushswap.h"
 #include "libft.h"
 
+void	ps_printprevnext(t_stack *s)
+{
+	size_t i;
+
+	ft_printf("A=%u, B=%u\n", s->a, s->b);
+	write(1, "prev[", 5);
+	i = -1;
+	while (++i < s->size)
+		ft_printf("%u, ", s->prev[i]);
+	write(1, "]\nnext[", 7);
+	i = -1;
+	while (++i < s->size)
+		ft_printf("%u, ", s->next[i]);
+	write(1, "]\n\n", 3);
+}
+
 //you may ask why not use int, but it's for readability.
 //there are at most 64 ranges. 
 void	ps_printrange(t_stack *s, unsigned char howmany)
@@ -17,22 +33,22 @@ void	ps_printrange(t_stack *s, unsigned char howmany)
 
 }
 
-void	ps_printstack(size_t ptr, t_stack *stack)
+void	ps_printstack(t_stack *s, size_t ptr)
 {
-	if (ptr == stack->a)
+	if (ptr == s->a)
 		ft_printf("%c[HEAD, ", 'A');
-	else if (ptr == stack->b)
+	else if (ptr == s->b)
 		ft_printf("%c[HEAD, ", 'B');
 	else
 		ft_printf("%c[HEAD, ", 'X');
 	if (ptr != SIZE_MAX)
 	{
 		ft_printf("%u, ", (unsigned int)ptr);
-		ptr = stack->next[ptr];
-		while (ptr != stack->a && ptr != stack->b)
+		ptr = s->next[ptr];
+		while (ptr != s->a && ptr != s->b)
 		{
 			ft_printf("%u, ", (unsigned int)ptr);
-			ptr = stack->next[ptr];
+			ptr = s->next[ptr];
 		}
 	}
 	else

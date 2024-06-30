@@ -13,7 +13,7 @@
 #ifndef PUSHSWAP_H
 # define PUSHSWAP_H
 
-//funfact: we only need at most 60 ranges!
+//funfact: we only need at most 63 ranges! even with SIZE_MAX digits.
 # ifndef PS_RANGE_COUNT
 #  define PS_RANGE_COUNT 64
 # endif
@@ -45,6 +45,7 @@ enum e_functions
 	F_SA,
 	F_SB,
 	F_SS,
+	F_NONE2,
 	F_PB,
 	F_RRA,
 	F_RRB,
@@ -75,31 +76,39 @@ typedef struct s_stack
 	int				fd;
 	void			(**fptrs)(struct s_stack *);
 	const char		**foutput;
-	const int		*foutputlen;
+	const size_t	*foutputlen;
+	unsigned char	a_bot_count;
+	unsigned char	b_bot_count;
 }	t_stack;
 
-void	ps_split_range_2a(t_stack *s, t_range *lower, t_range *higher);
-void	ps_split_range_2b(t_stack *s, t_range *lower, t_range *higher);
-void	ps_split_range_3a(t_stack *s, t_range *lower,
-						  t_range *middle, t_range *higher);
-
-void	ps_algorithm_entry(t_stack *s);
-void	ps_algorithm(t_stack *s);
-
+//debug :
 
 void	ps_printrange(t_stack *s, unsigned char howmany);
-void	ps_printstack(size_t ptr, t_stack *stack);
+void	ps_printstack(t_stack *s, size_t ptr);
+void	ps_printprevnext(t_stack *s);
+
+//function sequence :
+
+void	ps_run(t_stack *s, unsigned char function);
+void	ps_run_multiple(t_stack *s, int count, ...);
+void	ps_undo_multiple(t_stack *s, size_t amount);
+int		ps_write_fseq(t_stack *s);
+
+//algorithm :
+
+void	ps_algorithm_entry(t_stack *s);
+void	ps_split_range_a_into_3(t_stack *s, t_range *lower,
+								t_range *middle, t_range *higher);
+void	ps_split_range_a(t_stack *s, t_range *lower, t_range *higher);
+void	ps_split_range_b(t_stack *s, t_range *lower, t_range *higher);
 
 //hchar functions :
 
-bool			ps_write_fseq(t_stack *s);
-void			ps_run_multiple(t_stack *s, int count, ...);
-void			ps_run(t_stack *s, unsigned char function);
 unsigned char	ft_hchar_combine(unsigned char left, unsigned char right);
 unsigned char	ft_hchar_getleft(unsigned char lefrig);
 unsigned char	ft_hchar_getright(unsigned char lefrig);
 
-//double linked circular list manipulation (pushswap0-3.c) :
+//double array linked circular list manipulation (pushswap0-3.c) :
 
 //push stack x 'node' on top of stack y 'node' :
 void	push_x_to_y(size_t *x, size_t *y, t_stack *s);
@@ -107,7 +116,7 @@ void	push_x_to_y(size_t *x, size_t *y, t_stack *s);
 //swap this with s->next[this] :
 void	swap(size_t *this, t_stack *s);
 
-//rotate *this in dir direction
+//rotate *this in prev or next direction
 void	rotate(size_t *this, size_t *direction);
 
 void	pa(t_stack *s);
@@ -135,13 +144,27 @@ void	rrr(t_stack *s);
 //		sa (swap a):	Swap the first 2 elements at the top of stack a.
 //						Do nothing if there is only one or no elements.
 //		sb (swap b):	Swap the first 2 elements at the top of stack b.
-//						Do nothing if there is only one or no elements.
+//						Do nothing if there is only one or no elements. 
 //		ss (sa + sb):	swap stack a and b's 1st and 2nd element.
-//		ra (rotate a):	Shift up all elements of stack a by 1.
-//						The first element becomes the last one.
-//		rb (rotate b):	Shift up all elements of stack b by 1.
-//						The first element becomes the last one.
-//		rr (rotate ab):	Shift up all elements of stack a and b by 1.
-//		rra (reverse rotate a):		Shift down all elements of stack a by 1. The last element becomes the first one.
-//		rrb (reverse rotate b):		Shift down all elements of stack b by 1. The last element becomes the first one.
-//		rrr (reverse rotate ab):	Reverse Rotate a and b.
+//		ra (backward a):	Shift up all elements of stack a by 1. 
+//							The first element becomes the last one.
+//		rb (backward b):	Shift up all elements of stack b by 1. 
+//							The first element becomes the last one.
+//		rr (backward ab):	Shift up all elements of stack a and b by 1.
+//		rra (forward a):	Shift down all elements of stack a by 1.
+//							The last element becomes the first one.
+//		rrb (forward b):	Shift down all elements of stack b by 1.
+//							The last element becomes the first one.
+//		rrr (forward ab):	Shift down all elements of stack a and b by 1.
+
+
+// push_swap note:
+// usual stack sizes * sizeof(size_t) * sizeof(char) * 2;
+// 100*8*1*2 = 1600functionslots.
+// 500*8*1*2 = 8000functionslots.
+// 
+// as much as I would like (argc / movecount) to be linear, it isn't.
+// so we must find a way to compress even further or handle it by chunks....
+// but that is for another project!
+///////////////////////////////////////
+

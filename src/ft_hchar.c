@@ -10,15 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-// push_swap note:
-// usual stack sizes * sizeof(size_t) * sizeof(char) * 2;
-// 100*8*1*2 = 1600functionslots.
-// 500*8*1*2 = 8000functionslots.
-// 
-// as much as I would like (argc / movecount) to be linear, it isn't.
-// so we must find a way to compress even further or handle it by chunks....
-// but that is for another project!
-///////////////////////////////////////
+#include "pushswap.h"
+#include "libft.h"
 
 //this file is dedicated to storing and getting 4bit integers.
 //by using half of an unsigned char.
@@ -36,4 +29,37 @@ unsigned char	ft_hchar_getleft(unsigned char lefrig)
 unsigned char	ft_hchar_getright(unsigned char lefrig)
 {
 	return (lefrig & 0x0F);
+}
+
+int	ps_write_fseq(t_stack *s)
+{
+	ssize_t			written;
+	char			buffer[PS_WRITE_BUF_SIZE];
+	size_t			iter;
+	unsigned char	right;
+	unsigned char	left;
+
+	iter = -1;
+	written = 0;
+	while (++iter < s->fseqlen + (s->fseq[s->fseqlen] != F_NONE)
+			&& written >= 0 && written <= PS_WRITE_BUF_SIZE - 8)
+	{
+		right = ft_hchar_getright(s->fseq[iter]);
+		left = ft_hchar_getleft(s->fseq[iter]);
+		// printf("%i --- %i\n", left, right);
+		// printf("%zu --- %zu\n", iter, s->fseqlen);
+		// printf("%s, %zu", s->foutput[right], s->foutputlen[right]);
+		// printf("%s, %zu", s->foutput[left], s->foutputlen[left]);
+		ft_memcpy(buffer + written, s->foutput[right], s->foutputlen[right]);
+		written += s->foutputlen[right];
+		if (left != F_NONE)
+		{
+			ft_memcpy(buffer + written, s->foutput[left], s->foutputlen[left]);
+			written += s->foutputlen[left];
+		}
+		if (written >= PS_WRITE_BUF_SIZE - 8
+			|| iter == s->fseqlen + (s->fseq[s->fseqlen] != F_NONE))
+			written = write(s->fd, buffer, written);
+	}
+	return (written >= 0);
 }

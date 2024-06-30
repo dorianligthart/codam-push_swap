@@ -15,6 +15,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+void	ps_algorithm(t_stack *s)
+{
+	(void)s;
+}
 
 //Warning: doesn't allow remainder on targeted stack.
 static inline void	ps_solve3(t_stack *s, bool target_a)
@@ -41,30 +45,24 @@ static inline void	ps_solve3(t_stack *s, bool target_a)
 
 void	ps_algorithm_entry(t_stack *s)
 {
-	s->ri = 0;
-	s->ranges[s->ri].min = 0; 
-	s->ranges[s->ri].max = s->size - 1;
-	// ps_printstack(s->a, s);
+	ps_printstack(s, s->a);
 	if (s->size <= 3)
 		ps_solve3(s, true);
 	else if (s->size <= 6)
 	{
-		ps_run_multiple(s, 5, F_PB, F_PB, F_PB, F_PB, F_PB);
-		printf("stackA=%zu\n", s->a);
-		// ps_split_range_2a(s, &s->ranges[s->ri], &s->ranges[s->ri + 1]);
-		// ps_solve3(s, true);
-		// ps_solve3(s, false);
-		// ps_run_multiple(s, 3, F_PA, F_PA, F_PA);
-	}
-	else if (s->size <= 9)
-	{
-		ps_split_range_3a(s, &s->ranges[s->ri],
-						&s->ranges[s->ri + 1], &s->ranges[s->ri + 2]);
-		ft_printf("ERROR: argc=[7, 8, 9] unsupported yet\n");
-		// ps_solve_3(s, true);
-		// solve_23_yesremainder(s, false);
-		// ps_solve_3(s, false);
+		ps_split_range_a(s, &s->ranges[s->ri], &s->ranges[s->ri + 1]);
+		ps_solve3(s, true);
+		ps_solve3(s, false);
+		ps_run_multiple(s, 3, F_PA, F_PA, F_PA);
 	}
 	else
+	{
+		ps_split_range_a_into_3(s,
+								&s->ranges[s->ri],
+								&s->ranges[s->ri + 1],
+								&s->ranges[s->ri + 2]);
 		ps_algorithm(s);
+	}
+	ps_printrange(s, s->ri + 1);
+	ps_printstack(s, s->a);
 }

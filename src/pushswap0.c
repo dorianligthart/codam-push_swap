@@ -1,35 +1,31 @@
 #include "pushswap.h"
 #include "libft.h"
 
-
-//error in this function!!!
-// solution for inserting *x before *y:
-//
-// next[prev[y]] = *x
-// prev[*x]      = prev[*y]
-// 
-// prev[*y]      = *x
-// next[*x]      = *y
 void	push_x_to_y(size_t *x, size_t *y, t_stack *s)
 {
 	size_t	temp;
 
 	if (*x != SIZE_MAX)
 	{
-		temp = *x;
 		s->prev[s->next[*x]] = s->prev[*x];
 		s->next[s->prev[*x]] = s->next[*x];
+		temp = *x;
 		*x = s->next[*x];
 		if (*x == temp)
 			*x = SIZE_MAX;
 		if (*y == SIZE_MAX)
+		{
 			*y = temp;
+			s->next[*y] = temp;
+			s->prev[*y] = temp;
+		}
 		else
 		{
 			s->next[temp] = *y;
-			s->prev[temp] = *y;
-			s->next[*y] = temp;
+			s->prev[temp] = s->prev[*y];
 			s->prev[*y] = temp;
+			s->next[s->prev[*y]] = temp;
+			*y = temp;
 		}
 	}
 }
