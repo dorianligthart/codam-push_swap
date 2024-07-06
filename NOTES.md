@@ -1,4 +1,7 @@
 ```c
+//be aware: pushA and pushB are push TO A/B, not FROM.
+//easier reading.
+
 /*Hard coded stacksize cases:
 	2: solve3(A),
 	3: solve3(A),
@@ -62,7 +65,7 @@ rangesize=4 on stack A:
 	A: [3, 2, 0, 1 ...] -> swapA, rotA, swapA, rotA, swapA, revrotA, revrotA, swapA, rotA, swapA, revrotA.
 	A: [3, 2, 1, 0 ...] -> swapA, rotA, swapA, rotA, swapA, revrotA, revrotA, swapA, rotA, swapA, revrotA, swapA.
 
-rangesize=4 to stack A:
+rangesize=4 on stack B:
 	B: [3, 2, 1, 0 ...] -> pushB, pushB, pushB, pushB.
 	B: [3, 2, 0, 1 ...] -> pushB, pushB, swapB, pushB, pushB.
 	B: [3, 1, 2, 0 ...] -> pushB, swapB, pushB, pushB, pushB.
@@ -121,3 +124,26 @@ Conclusion:
 	repeat this until range.min is reached.
 */
 ```
+
+
+### old notes:
+
+//ALGORITHM steps:
+1.  divide stack A 1/2 to stack B (upper or lower half depending on: 
+	if the result will be high to low or low to high(optional!)),
+	then go through both stacks at same time to push
+	to bottom of both stacks 2/4, 3/6, 4/8, 5/10 etc,
+	so that a range is not bigger than PS_RA NGE_MIN.
+    1.1 To be able to do this you need to know size % PS_RANGE_MIN and edit
+	the ranges each time we do an iteration.
+    1.2 
+2.  pushA/rotateA/swapAB to stack B into the ranges.
+    2.1 keep highest range on stack A.
+3.  solve the (new) range on stack A, then rotate B until smallest/biggest range
+	appears, push that range to stack A, sort range.
+4.  repeat step 3 range->count - 1 amount of times.
+
+
+find out what range size is best. 
+Test 10times with 16 32 64 128 uints on stack B,
+and range size 6 8 12 16 24 32, see the average, compare ratios between next/prev rs.

@@ -21,10 +21,13 @@ void	push_x_to_y(size_t *x, size_t *y, t_stack *s)
 		}
 		else
 		{
+					// if (s->next[temp] == *y)
+			// 	s->next[*y] = temp;
+			// else
+			s->next[s->prev[*y]] = temp;
 			s->next[temp] = *y;
 			s->prev[temp] = s->prev[*y];
 			s->prev[*y] = temp;
-			s->next[s->prev[*y]] = temp;
 			*y = temp;
 		}
 	}

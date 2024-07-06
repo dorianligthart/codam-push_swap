@@ -13,13 +13,15 @@
 #ifndef PUSHSWAP_H
 # define PUSHSWAP_H
 
-//funfact: we only need at most 63 ranges! even with SIZE_MAX digits.
+//	funfact: we only need at most 64 ranges! even with SIZE_MAX digits.
+//	because 2^64 is (SIZE_MAX - 1). and we only support (your ram - SIZE_MAX/3 - some kb)
+//	we also use consecutive even/odd ranges on the smallest range size ranges.
 # ifndef PS_RANGE_COUNT
 #  define PS_RANGE_COUNT 64
 # endif
 
-# ifndef PS_WRITE_BUF_SIZE
-#  define PS_WRITE_BUF_SIZE 64
+# ifndef PS_WRITE_CHAR_COUNT
+#  define PS_WRITE_CHAR_COUNT 64
 # endif
 
 # ifndef EXIT_ERROR
@@ -71,6 +73,8 @@ typedef struct s_stack
 	size_t			b;
 	t_range			ranges[PS_RANGE_COUNT];
 	unsigned char	ri;
+	bool			ranges_is_odd[PS_RANGE_COUNT];
+	bool			ranges_is_even[PS_RANGE_COUNT];
 	unsigned char	*fseq;
 	size_t			fseqlen;
 	int				fd;

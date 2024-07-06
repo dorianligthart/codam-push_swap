@@ -55,22 +55,3 @@ void	ps_printstack(t_stack *s, size_t ptr)
 		ft_printf("EMPTY, ");
 	ft_printf("TAIL]\n");
 }
-
-//maybe will use this in future, needs debugging and i cant be bothered.
-bool	ps_israngesorted(t_stack *s, size_t ptr, t_range *range, bool inverse)
-{
-	size_t	stay;
-	size_t	n;
-
-	if (ptr == SIZE_MAX)
-		return (false);
-	n = range->max - range->min + 1;
-	stay = ptr;
-	while (s->next[ptr] != stay && n--)
-	{
-		if (s->next[ptr] != ptr + (inverse == true) * -2 + 1)
-			return (false);
-		ptr = s->next[ptr];
-	}
-	return (true);
-}

@@ -39,7 +39,7 @@ static int	ps_main3(t_stack *stack)
 	stack->fptrs = fptrs;
 	stack->foutput = foutput;
 	stack->foutputlen = foutputlen;
-	// ps_algorithm_entry(stack);
+	ps_algorithm_entry(stack);
 	
 	ps_printprevnext(stack);
 	pb(stack);
