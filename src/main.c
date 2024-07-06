@@ -19,37 +19,26 @@
 #include <limits.h>
 #include <stdint.h> //SIZE_MAX
 
+
 static int	ps_main3(t_stack *stack)
 {
-	void		(*fptrs[F_COUNT])(t_stack *) = {[F_PA] = pa,
-					[F_RA] = ra, [F_RB] = rb, [F_RR] = rr,
-					[F_SA] = sa, [F_SB] = sb, [F_SS] = ss, [F_PB] = pb, 
-					[F_RRA] = rra, [F_RRB] = rrb, [F_RRR] = rrr,
-					[FU_SA] = sa, [FU_SB] = sb, [FU_SS] = ss};
-	const char	*foutput[F_COUNT] = {[F_NONE] = "", [F_PA] = "pa\n",
-					[F_RA] = "ra\n", [F_RB] = "rb\n", [F_RR]  "rr\n",
-					[F_SA] = "sa\n", [F_SB] = "sb\n", [F_SS] = "ss\n",
-					[F_NONE2] = "", [F_PB] = "pb\n", [F_RRA] = "rra\n",
-					[F_RRB] = "rrb\n", [F_RRR] = "rrr\n"};
-	const size_t	foutputlen[F_COUNT] = {[F_NONE] = 0, [F_PA] = 3,
-					[F_RA] = 3, [F_RB] = 3, [F_RR] = 3, [F_SA] = 3, [F_SB] = 3,
-					[F_SS] = 3, [F_NONE2] = 0, [F_PB] = 3,
-					[F_RRA] = 4, [F_RRB] = 4, [F_RRR] = 4};
+	void (*fptrs[F_COUNT])(t_stack *) 
+		= {NULL, sa, sb, ss, pa, pb, ra, rb, rr, rra, rrb, rrr};
+	const char *foutput[F_COUNT]
+		= {NULL, "sa\n", "sb\n", "ss\n", "pa\n", "pb\n",
+		"ra\n", "rb\n", "rr\n", "rra\n", "rrb\n", "rrr\n"};
+	const int foutputlen[F_COUNT]
+		= {0, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4};
+	const int fundo[F_COUNT]
+		= {0, 1, 2, 3, 5, 4, 9, 10, 11, 6, 7, 8};
 
 	stack->fptrs = fptrs;
 	stack->foutput = foutput;
 	stack->foutputlen = foutputlen;
+	stack->fundo = fundo;
+
+
 	ps_algorithm_entry(stack);
-	
-	ps_printprevnext(stack);
-	pb(stack);
-	ps_printprevnext(stack);
-	pb(stack);
-	ps_printprevnext(stack);
-	pb(stack);
-	ps_printprevnext(stack);
-	pb(stack);
-	ps_printprevnext(stack);
 	return (ps_write_fseq(stack));
 }
 
@@ -61,7 +50,7 @@ static int	main2(size_t *uints, t_stack *stack)
 	ft_normalise_size(uints, stack->size);
 	stack->prev = (size_t *)malloc((2 * stack->size) * sizeof(size_t));
 	if (stack->prev == NULL)
-		return (free(uints), EXIT_ERROR);
+		return (free(uints), ft_printf("Error\n"), EXIT_ERROR);
 	stack->next = stack->prev + stack->size;
 	i = -1;
 	while (++i < stack->size)
@@ -124,7 +113,7 @@ int	main(int argc, char const **argv)
 	size_t			*uints;
 
 	if (argc < 2)
-		return (ft_printf("Error.\n"), EXIT_ERROR);
+		return (ft_printf("Error\n"), EXIT_ERROR);
 	ft_memset(&stack, 0, sizeof(t_stack));
 	argv++;
 	argc--;
@@ -139,7 +128,7 @@ int	main(int argc, char const **argv)
 	{
 		stack.a = str_to_uints(argv[i], uints, stack.a);
 		if (stack.a == 0)
-			return (free(uints), EXIT_ERROR);
+			return (free(uints), ft_printf("Error\n"), EXIT_ERROR);
 	}
 	return (main2(uints, &stack));
 }

@@ -15,26 +15,26 @@
 
 void	pa(t_stack *s)
 {
-	push_x_to_y(&s->b, &s->a, s);
+	push_x_to_y(&(s->b), &(s->a), s);
 }
 
 void	pb(t_stack *s)
 {
-    push_x_to_y(&s->a, &s->b, s);
+    push_x_to_y(&(s->a), &(s->b), s);
 }
 
 void	sa(t_stack *s)
 {
-	swap(&s->a, s);
+	swap(&(s->a), s);
 }
 
 void	sb(t_stack *s)
 {
-	swap(&s->b, s);
+	swap(&(s->b), s);
 }
 
 void	ss(t_stack *s)
 {
-	swap(&s->a, s);
-	swap(&s->b, s);
+	swap(&(s->a), s);
+	swap(&(s->b), s);
 }

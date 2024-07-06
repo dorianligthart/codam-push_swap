@@ -45,7 +45,6 @@ static inline void	ps_solve3(t_stack *s, bool target_a)
 
 void	ps_algorithm_entry(t_stack *s)
 {
-	ps_printstack(s, s->a);
 	if (s->size <= 3)
 		ps_solve3(s, true);
 	else if (s->size <= 6)
@@ -63,6 +62,4 @@ void	ps_algorithm_entry(t_stack *s)
 								&s->ranges[s->ri + 2]);
 		ps_algorithm(s);
 	}
-	ps_printrange(s, s->ri + 1);
-	ps_printstack(s, s->a);
 }

@@ -1,6 +1,12 @@
 NAME     = push_swap
 NAME_BON = checker_linux
-CC       = cc
+ifeq ($(shell uname), Linux)
+    CC = cc
+else ifeq ($(shell uname), Darwin)
+    CC = clang
+else
+    CC = gcc
+endif
 CFLAGS   = -I ./include -Wall -Wextra -g #-fsanitize=address
 
 SRC = $(shell find src -iname "*.c") #TODO: PROJECT_END: type out src
