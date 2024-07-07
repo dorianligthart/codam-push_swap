@@ -1,6 +1,10 @@
 #include "pushswap.h"
 #include "libft.h"
 
+
+// if (s->next[temp] == *y)
+// 	s->next[*y] = temp;
+// else
 void	push_x_to_y(size_t *x, size_t *y, t_stack *s)
 {
 	size_t	temp;
@@ -21,9 +25,6 @@ void	push_x_to_y(size_t *x, size_t *y, t_stack *s)
 		}
 		else
 		{
-					// if (s->next[temp] == *y)
-			// 	s->next[*y] = temp;
-			// else
 			s->next[s->prev[*y]] = temp;
 			s->next[temp] = *y;
 			s->prev[temp] = s->prev[*y];
@@ -64,6 +65,6 @@ void	rotate(size_t *this, size_t *direction)
 
 void	rrr(t_stack *s)
 {
-	rotate(&s->a, s->prev);
-	rotate(&s->b, s->next);
+	rotate(&(s->a), s->prev);
+	rotate(&(s->b), s->prev);
 }

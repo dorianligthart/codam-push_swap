@@ -36,11 +36,11 @@ void	ps_printrange(t_stack *s, unsigned char howmany)
 void	ps_printstack(t_stack *s, size_t ptr)
 {
 	if (ptr == s->a)
-		ft_printf("%c[HEAD, ", 'A');
+		ft_printf("%c[", 'A');
 	else if (ptr == s->b)
-		ft_printf("%c[HEAD, ", 'B');
+		ft_printf("%c[", 'B');
 	else
-		ft_printf("%c[HEAD, ", 'X');
+		ft_printf("%c[", 'X');
 	if (ptr != SIZE_MAX)
 	{
 		ft_printf("%u, ", (unsigned int)ptr);
@@ -52,6 +52,6 @@ void	ps_printstack(t_stack *s, size_t ptr)
 		}
 	}
 	else
-		ft_printf("EMPTY, ");
-	ft_printf("TAIL]\n");
+		ft_printf("EMPTY");
+	ft_printf("]\n");
 }

@@ -35,6 +35,29 @@ bool	ps_israngesorted(t_stack *s, size_t ptr, t_range *range, bool inverse)
 }
 
 int	ps_write_fseq(t_stack *s)
+{	
+	unsigned char	right;
+	unsigned char	left;
+	size_t			iter;
+
+	iter = 0;
+	if (s->fseqlen == 0)
+		return (EXIT_SUCCESS);
+	while (iter <= s->fseqlen)
+	{
+		right = ft_hchar_getright(s->fseq[iter]);
+		left = ft_hchar_getleft(s->fseq[iter]);
+		if (write(s->fd, s->foutput[right], s->foutputlen[right]) < 0)
+			return (EXIT_ERROR);
+		if (left != F_NONE
+			&& write(s->fd, s->foutput[left], s->foutputlen[left]) < 0)
+			return (EXIT_ERROR);
+		iter++;
+	}
+	return (EXIT_SUCCESS);
+}
+
+int	ps_write_fseq_in_chunks(t_stack *s)
 {
 	ssize_t			written;
 	char			buffer[PS_WRITE_CHAR_COUNT];
@@ -71,6 +94,7 @@ void	ps_run(t_stack *s, unsigned char function)
 {
 	if (function == F_NONE || function >= F_COUNT)
 		return ;
+	s->fptrs[function](s);
 	if (s->fseq[s->fseqlen] == F_NONE)
 		s->fseq[s->fseqlen] = function;
 	else
@@ -80,7 +104,6 @@ void	ps_run(t_stack *s, unsigned char function)
 										function);
 		s->fseqlen++;
 	}
-	s->fptrs[function](s);
 }
 
 void	ps_run_multiple(t_stack *s, int count, ...)
