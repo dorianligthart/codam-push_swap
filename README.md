@@ -5,7 +5,7 @@ inspired by [this-youtube-video](https://www.youtube.com/watch?v=2aMrmWOgLvU). a
 
 ### Program objective :
 Considering 2 stacks, stack A, an unordered list of integers, and an empty stack B.\
-Possible stack manipulation moves to order the digits on/to stack A and B:
+Possible stack manipulation moves to order the digits on stack A and to B:
 - push first element 
 	of A to B or B to A
 - swap first 2 elements
@@ -19,24 +19,23 @@ NOTE: e.g. `rra` 'reverse' rotates stack A. `rr` and `rrr` is rotating ***both**
 ### ALGORITHM ideas:
 
 - depending on last/first few digits in a range, shrink that range and expand the coresponding consecutive range.
-- in case of a good digit going bad, save from the 1 (or more) conflicting digits,
-	the highest digit(s) on the END of stack.
+- in case of a good digit going bad when range splitting, save from the 1 (or more) conflicting digits,
+	the highest digit(s) on the END of stack by rotating.
 - then at end of handling that range move back those digits and update range. find out if its worth it, if range min is close to targeted digit.
 
 ### ALGORITHM stages:
 1. Splitting stage 1/2 (split into 3 at start,):
    - split stack A to B.
-   - split range on A over and over until certain range size or TBD. 
+   - split range on A over and over, until its size 4 or lower. 
    - rotating/pushing so stack A will remain the high half and B the low half.
    - (shrinking, expanding consecutive range if range endings and beginnings are in the wrong place.)
 2. Splitting stage 2/2:
    - split stack B to A.
    - the same as stage 1 but from stack B's perspective. 
 
-### ALGORITHM using raster way of splitting a range :
-- instead of low/high halfs, we move ordered (or one swap move away) bi-sequential (even/odd) at end of both stacks with remainder on stack B so we can rrr+pa.\
+### (wouldnt work) ALGORITHM using raster way of solving a range :
+- if its the last range: instead of low/high halfs, we move ordered (or one swap move away TBD) bi-sequential (even/odd) at end of both stacks with remainder on stack B so we can rrr+pa.\
   note: doing this layered obviously doesn't work (raster of a raster).
-- 
 
 
 ```C
